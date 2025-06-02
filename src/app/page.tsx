@@ -7,6 +7,7 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { CountrySearchSection } from "@/components/landing/country-search-section";
 import { PopularDestinationsSection } from "@/components/landing/popular-destinations-section";
 import { AdvancedFeaturesSection } from "@/components/landing/advanced-features-section";
+import { SetupGuideSection } from "@/components/landing/setup-guide-section"; // Added import
 import { SmsFeaturesSection } from "@/components/landing/sms-features-section";
 import { ManageTrafficSection } from "@/components/landing/manage-traffic-section";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
@@ -32,6 +33,7 @@ export default function HomePage() {
         <CountrySearchSection />
         <PopularDestinationsSection />
         <AdvancedFeaturesSection />
+        <SetupGuideSection /> {/* Added new section */}
         <SmsFeaturesSection />
         <ManageTrafficSection />
         <TestimonialsSection />
