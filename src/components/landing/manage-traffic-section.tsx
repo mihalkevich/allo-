@@ -18,7 +18,7 @@ export function ManageTrafficSection() {
             <p className="mb-6 text-lg text-muted-foreground">
               You can download the Allo app to manage your eSIM profiles and data usage more easily, keeping you in control wherever you are.
             </p>
-            <Link href="/dashboard/esim" passHref>
+            <Link href="/register" passHref>
               <Button size="lg" className="px-8 py-3 text-base shadow-md hover:shadow-lg transition-shadow">
                 Get Mobile Data
               </Button>

@@ -15,7 +15,7 @@ export function HeroSection({ activeService }: HeroSectionProps) {
   const titleContent = isMobileActive ? (
     <>
       Mobile data with{' '}
-      <span 
+      <span
         className="bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text px-2 py-1 relative inline-block"
         style={{ filter: 'drop-shadow(0 0 0.5rem rgba(100,100,255,0.3))' }}
       >
@@ -29,7 +29,7 @@ export function HeroSection({ activeService }: HeroSectionProps) {
     : "Get a virtual phone number for calls and SMS from anywhere in the world. Private, secure, and affordable.";
 
   const buttonText = isMobileActive ? "Buy Now" : "Get Virtual Number";
-  const buttonLink = isMobileActive ? "/dashboard/esim" : "/dashboard/sms";
+  const buttonLink = "/register"; // Changed to always link to /register
 
   return (
     <section className="py-16 md:py-24 bg-gradient-to-b from-background to-secondary/30 animate-fade-in">

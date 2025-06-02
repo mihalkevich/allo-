@@ -48,7 +48,7 @@ export function SetupGuideSection() {
           ))}
         </div>
 
-        <Link href="/dashboard/esim" passHref>
+        <Link href="/register" passHref>
           <Button size="lg" className="px-10 py-6 text-lg shadow-lg hover:shadow-xl transition-shadow">
             Get Mobile Data
           </Button>

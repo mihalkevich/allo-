@@ -27,7 +27,7 @@ export function PopularDestinationsSection() {
           ))}
         </div>
         <div className="mt-12 text-center">
-          <Link href="/dashboard/esim" passHref>
+          <Link href="/register" passHref>
             <Button size="lg" className="px-8 py-3 text-base shadow-md hover:shadow-lg transition-shadow">
               See all countries
             </Button>
