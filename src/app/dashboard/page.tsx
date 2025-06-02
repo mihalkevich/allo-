@@ -1,11 +1,16 @@
+
 "use client";
 
 import { useState } from "react";
-import { AppHeader, type ServiceType } from "@/components/layout/app-header";
+import { AppHeader } from "@/components/layout/app-header"; // Removed ServiceType import
 import { SmsPanel } from "@/components/sms/sms-panel";
 import { EsimPanel } from "@/components/esim/esim-panel";
 import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Added Tabs import
+
+// Added ServiceType definition here as it's no longer from AppHeader
+export type ServiceType = "dashboard" | "sms" | "esim";
 
 export default function DashboardPage() {
   const [activeService, setActiveService] = useState<ServiceType>("dashboard");
@@ -24,9 +29,21 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col h-screen">
-      <AppHeader activeService={activeService} setActiveService={setActiveService} />
+      <AppHeader /> {/* activeService and setActiveService props removed */}
+      
+      {/* Tabs for service navigation moved into the page */}
+      <div className="container pt-4 pb-2 border-b">
+        <Tabs value={activeService} onValueChange={(value) => setActiveService(value as ServiceType)} className="w-full">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-12 sm:h-auto">
+            <TabsTrigger value="dashboard" className="text-base py-2.5 sm:py-2">Dashboard</TabsTrigger>
+            <TabsTrigger value="sms" className="text-base py-2.5 sm:py-2">SMS</TabsTrigger>
+            <TabsTrigger value="esim" className="text-base py-2.5 sm:py-2">eSIM</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       <ScrollArea className="flex-1">
-        <div className="container py-5 md:py-8"> {/* 20px for py-5, 32px for py-8 */}
+        <div className="container py-5 md:py-8">
           {renderContent()}
         </div>
       </ScrollArea>
