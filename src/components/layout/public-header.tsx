@@ -9,9 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Sun, Globe, Menu, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import type { ActiveServiceType } from '@/app/page';
 
-export function PublicHeader() {
-  const [activeService, setActiveService] = useState<'mobile' | 'virtual'>('mobile');
+interface PublicHeaderProps {
+  activeService: ActiveServiceType;
+  setActiveService: (service: ActiveServiceType) => void;
+}
+
+export function PublicHeader({ activeService, setActiveService }: PublicHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -33,7 +38,7 @@ export function PublicHeader() {
               onClick={() => setActiveService('mobile')}
               className={cn(
                 "transition-colors",
-                activeService === 'mobile' ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
+                 activeService === 'mobile' ? '' : 'hover:bg-accent hover:text-accent-foreground'
               )}
             >
               Mobile data
@@ -44,7 +49,7 @@ export function PublicHeader() {
               onClick={() => setActiveService('virtual')}
               className={cn(
                 "transition-colors",
-                activeService === 'virtual' ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
+                activeService === 'virtual' ? '' : 'hover:bg-accent hover:text-accent-foreground'
               )}
             >
               Virtual Number
