@@ -10,8 +10,9 @@ import { AdvancedFeaturesSection } from "@/components/landing/advanced-features-
 import { SetupGuideSection } from "@/components/landing/setup-guide-section";
 import { SmsFeaturesSection } from "@/components/landing/sms-features-section";
 import { ManageTrafficSection } from "@/components/landing/manage-traffic-section";
-import { DownloadAppSection } from "@/components/landing/download-app-section"; // Added import
+import { DownloadAppSection } from "@/components/landing/download-app-section";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
+import { FaqSection } from "@/components/landing/faq-section"; // Added import
 
 export type ActiveServiceType = 'mobile' | 'virtual';
 
@@ -37,10 +38,10 @@ export default function HomePage() {
         <SetupGuideSection />
         <SmsFeaturesSection />
         <ManageTrafficSection />
-        <DownloadAppSection /> {/* Added new section */}
+        <DownloadAppSection />
         <TestimonialsSection />
+        <FaqSection /> {/* Added new section */}
       </main>
     </LandingLayout>
   );
 }
-
