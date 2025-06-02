@@ -5,9 +5,9 @@ import type { ESIMPlan } from "@/types/esim";
 import { PlanCard } from "./plan-card";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
-import { useBalance } from "@/contexts/balance-context"; // Import useBalance
+import { useState, useMemo } from "react";
+import { useBalance } from "@/contexts/balance-context";
+import { CountryFlagGridSelector, type CountryOption } from "@/components/shared/country-flag-grid-selector";
 
 interface AvailablePlansListProps {
   plans: ESIMPlan[];
@@ -15,9 +15,9 @@ interface AvailablePlansListProps {
 
 export function AvailablePlansList({ plans: initialPlans }: AvailablePlansListProps) {
   const { toast } = useToast();
-  const { balance, deductBalance, openTopUpModal } = useBalance(); // Use balance context
+  const { balance, deductBalance, openTopUpModal } = useBalance();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("all");
+  const [selectedCountryCode, setSelectedCountryCode] = useState("all");
 
   const handlePurchase = (planId: string) => {
     const planToPurchase = initialPlans.find(p => p.id === planId);
@@ -42,37 +42,50 @@ export function AvailablePlansList({ plans: initialPlans }: AvailablePlansListPr
     }
   };
 
-  const uniqueCountries = ["all", ...new Set(initialPlans.map(plan => plan.country))];
+  const uniqueCountryOptions = useMemo(() => {
+    const countryDataMap = new Map<string, CountryOption>();
+    initialPlans.forEach(plan => {
+      // For eSIM, 'countryCode' might be less straightforward if a plan covers multiple countries (e.g., "Europe").
+      // We'll use plan.countryCode if available, otherwise a simplified code or plan.country itself.
+      // For simplicity, we use plan.countryCode directly and assume it's unique enough for filtering.
+      // If a plan is "Europe Zone 1" with code "EU", it will appear as one "country".
+      const code = plan.countryCode || plan.country.replace(/\s+/g, '-').toLowerCase();
+      if (!countryDataMap.has(code)) {
+        countryDataMap.set(code, { code: code, name: plan.country, flag: plan.flag });
+      }
+    });
+    return Array.from(countryDataMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [initialPlans]);
 
-  const filteredPlans = initialPlans
-    .filter(plan => selectedCountry === "all" || plan.country === selectedCountry)
+
+  const filteredPlans = useMemo(() => {
+    return initialPlans
+    .filter(plan => {
+        const planCode = plan.countryCode || plan.country.replace(/\s+/g, '-').toLowerCase();
+        return selectedCountryCode === "all" || planCode === selectedCountryCode;
+    })
     .filter(plan => 
       plan.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
       plan.planName.toLowerCase().includes(searchTerm.toLowerCase())
     );
+  }, [initialPlans, selectedCountryCode, searchTerm]);
+
 
   return (
     <div className="space-y-6 p-1">
-       <div className="flex flex-col sm:flex-row gap-4">
+       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <Input 
           placeholder="Search by country or plan name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-xs"
+          className="max-w-sm"
         />
-        <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Filter by country" />
-          </SelectTrigger>
-          <SelectContent>
-            {uniqueCountries.map(country => (
-              <SelectItem key={country} value={country}>
-                {country === "all" ? "All Countries" : country}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
+      <CountryFlagGridSelector
+        countries={uniqueCountryOptions}
+        selectedCountry={selectedCountryCode}
+        onSelectCountry={setSelectedCountryCode}
+      />
       {filteredPlans.length === 0 && (
         <p className="text-center text-muted-foreground py-8">No plans match your criteria.</p>
       )}

@@ -2,17 +2,19 @@
 "use client";
 
 import { useState } from "react";
-import type { LeasedSMSNumber, SMSMessage } from "@/types/sms";
+import type { LeasedSMSNumber, SMSMessage, AvailableSMSNumber } from "@/types/sms";
 import { mockAvailableNumbers, mockLeasedNumbers, mockSmsMessages } from "@/data/mock-sms";
 import { AvailableNumbersList } from "./available-numbers-list";
 import { MyNumbersList } from "./my-numbers-list";
 import { SMSHistoryView } from "./sms-history-view";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessagesSquare, Search } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function SmsPanel() {
-  const availableNumbers = mockAvailableNumbers;
-  const leasedNumbersData = mockLeasedNumbers; // Renamed to avoid conflict if we introduce fetched data
+  const { toast } = useToast();
+  const [allAvailableNumbers, setAllAvailableNumbers] = useState<AvailableSMSNumber[]>(mockAvailableNumbers);
+  const [myLeasedNumbers, setMyLeasedNumbers] = useState<LeasedSMSNumber[]>(mockLeasedNumbers);
 
   const [selectedNumber, setSelectedNumber] = useState<LeasedSMSNumber | null>(null);
   const [messages, setMessages] = useState<SMSMessage[]>([]);
@@ -26,6 +28,31 @@ export function SmsPanel() {
     setSelectedNumber(null);
     setMessages([]);
   };
+
+  const handleConfirmLease = (numberId: string, duration: number) => {
+    const numberToLease = allAvailableNumbers.find(n => n.id === numberId);
+    if (!numberToLease) {
+      toast({ title: "Error", description: "Number not found.", variant: "destructive" });
+      return;
+    }
+
+    const newLeasedNumber: LeasedSMSNumber = {
+      ...numberToLease,
+      leasedUntil: new Date(Date.now() + duration * 30 * 24 * 60 * 60 * 1000).toISOString(), // duration in months
+      autoRenew: false, 
+      comment: "", 
+      lastActivity: new Date().toISOString(),
+    };
+
+    setMyLeasedNumbers(prev => [newLeasedNumber, ...prev]); // Add to the beginning of the list
+    setAllAvailableNumbers(prev => prev.filter(n => n.id !== numberId));
+
+    toast({
+      title: "Lease Confirmed (Demo)",
+      description: `${newLeasedNumber.phoneNumber} leased for ${duration} month(s). It's now in 'My Numbers'.`,
+    });
+  };
+
 
   return (
     <div className="animate-fade-in">
@@ -45,7 +72,10 @@ export function SmsPanel() {
               <Search className="w-6 h-6 mr-3 text-primary" />
               <h2 className="text-2xl font-semibold tracking-tight">Available Numbers</h2>
             </div>
-            <AvailableNumbersList numbers={availableNumbers} />
+            <AvailableNumbersList 
+              numbers={allAvailableNumbers} 
+              onConfirmLease={handleConfirmLease} 
+            />
           </section>
 
           <section id="my-numbers">
@@ -54,7 +84,7 @@ export function SmsPanel() {
               <h2 className="text-2xl font-semibold tracking-tight">My Numbers & Messages</h2>
             </div>
             <MyNumbersList
-              numbers={leasedNumbersData}
+              numbers={myLeasedNumbers}
               onSelectNumber={handleSelectLeasedNumber}
               selectedNumberId={selectedNumber?.id}
             />

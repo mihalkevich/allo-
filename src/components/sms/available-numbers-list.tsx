@@ -4,34 +4,31 @@
 import type { AvailableSMSNumber } from "@/types/sms";
 import { NumberCard } from "./number-card";
 import { useToast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { useBalance } from "@/contexts/balance-context"; // Import useBalance
+import { useState, useMemo } from "react";
+import { useBalance } from "@/contexts/balance-context";
+import { CountryFlagGridSelector, type CountryOption } from "@/components/shared/country-flag-grid-selector";
 
 interface AvailableNumbersListProps {
   numbers: AvailableSMSNumber[];
+  onConfirmLease: (numberId: string, duration: number) => void;
 }
 
-export function AvailableNumbersList({ numbers: initialNumbers }: AvailableNumbersListProps) {
+export function AvailableNumbersList({ numbers: initialNumbers, onConfirmLease }: AvailableNumbersListProps) {
   const { toast } = useToast();
-  const { balance, deductBalance, openTopUpModal } = useBalance(); // Use balance context
+  const { balance, deductBalance, openTopUpModal } = useBalance();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("all");
+  const [selectedCountryCode, setSelectedCountryCode] = useState("all");
 
-  const handleLease = (numberId: string, duration: number) => {
+  const handleAttemptLease = (numberId: string, duration: number) => {
     const numberToLease = initialNumbers.find(n => n.id === numberId);
     if (!numberToLease) return;
 
-    const leasePrice = numberToLease.pricePerMonth * duration; // Assuming duration is in months
+    const leasePrice = numberToLease.pricePerMonth * duration;
 
     if (deductBalance(leasePrice)) {
-      toast({
-        title: "Lease Successful (Demo)",
-        description: `Leasing ${numberToLease.phoneNumber} for ${duration} month(s) at $${leasePrice.toFixed(2)}. New balance: $${(balance - leasePrice).toFixed(2)}`,
-      });
-      console.log(`Lease number ${numberId} for ${duration} months. Price: $${leasePrice.toFixed(2)}`);
-      // In a real app, update leased numbers list or trigger a refetch
+      onConfirmLease(numberId, duration);
+      // Success toast will be handled by SmsPanel after list update
     } else {
       toast({
         title: "Insufficient Funds",
@@ -42,43 +39,50 @@ export function AvailableNumbersList({ numbers: initialNumbers }: AvailableNumbe
     }
   };
   
-  const uniqueCountries = ["all", ...new Set(initialNumbers.map(num => num.country))];
+  const uniqueCountryOptions = useMemo(() => {
+    const countryDataMap = new Map<string, CountryOption>();
+    initialNumbers.forEach(num => {
+      if (!countryDataMap.has(num.countryCode)) {
+        countryDataMap.set(num.countryCode, { code: num.countryCode, name: num.country, flag: num.flag });
+      }
+    });
+    return Array.from(countryDataMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [initialNumbers]);
 
-  const filteredNumbers = initialNumbers
-    .filter(num => selectedCountry === "all" || num.country === selectedCountry)
-    .filter(num => 
-      num.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      num.phoneNumber.includes(searchTerm)
-    );
+  const filteredNumbers = useMemo(() => {
+    return initialNumbers
+      .filter(num => selectedCountryCode === "all" || num.countryCode === selectedCountryCode)
+      .filter(num => 
+        num.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        num.phoneNumber.includes(searchTerm)
+      );
+  }, [initialNumbers, selectedCountryCode, searchTerm]);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <Input 
           placeholder="Search by country or phone number..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-xs"
+          className="max-w-sm"
         />
-        <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Filter by country" />
-          </SelectTrigger>
-          <SelectContent>
-            {uniqueCountries.map(country => (
-              <SelectItem key={country} value={country}>
-                {country === "all" ? "All Countries" : country}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
+      <CountryFlagGridSelector
+        countries={uniqueCountryOptions}
+        selectedCountry={selectedCountryCode}
+        onSelectCountry={setSelectedCountryCode}
+      />
       {filteredNumbers.length === 0 && (
         <p className="text-center text-muted-foreground py-8">No numbers match your criteria.</p>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
         {filteredNumbers.map((number) => (
-          <NumberCard key={number.id} number={number} onLease={handleLease} />
+          <NumberCard 
+            key={number.id} 
+            number={number} 
+            onLease={handleAttemptLease} // Changed from onLease to handleAttemptLease
+          />
         ))}
       </div>
     </div>
