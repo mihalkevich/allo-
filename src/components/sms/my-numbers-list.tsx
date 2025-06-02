@@ -1,22 +1,22 @@
+
 "use client";
 
-import type { LeasedSMSNumber, SMSMessage } from "@/types/sms";
+import type { LeasedSMSNumber } from "@/types/sms";
 import { NumberCard } from "./number-card";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { SMSHistoryView } from "./sms-history-view";
-import { mockSmsMessages } from "@/data/mock-sms";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 
 interface MyNumbersListProps {
   numbers: LeasedSMSNumber[];
+  onSelectNumber: (number: LeasedSMSNumber) => void;
+  selectedNumberId?: string;
 }
 
-export function MyNumbersList({ numbers: initialNumbers }: MyNumbersListProps) {
+export function MyNumbersList({ numbers: initialNumbers, onSelectNumber, selectedNumberId }: MyNumbersListProps) {
   const { toast } = useToast();
   const [numbers, setNumbers] = useState<LeasedSMSNumber[]>(initialNumbers);
-  const [selectedNumberForHistory, setSelectedNumberForHistory] = useState<LeasedSMSNumber | null>(null);
 
   const handleRenew = (numberId: string, duration: number) => {
     const number = numbers.find(n => n.id === numberId);
@@ -45,40 +45,21 @@ export function MyNumbersList({ numbers: initialNumbers }: MyNumbersListProps) {
     console.log(`Toggle auto-renew for ${numberId} to ${autoRenew}`);
   };
 
-  const handleViewMessages = (number: LeasedSMSNumber) => {
-    setSelectedNumberForHistory(number);
-  };
-
-  const handleCloseHistory = () => {
-    setSelectedNumberForHistory(null);
-  };
-
-  if (selectedNumberForHistory) {
-    const messages = mockSmsMessages[selectedNumberForHistory.phoneNumber] || [];
-    return (
-      <SMSHistoryView 
-        number={selectedNumberForHistory} 
-        messages={messages}
-        onClose={handleCloseHistory}
-      />
-    );
-  }
-
   if (numbers.length === 0) {
     return (
-       <Alert className="max-w-md mx-auto mt-8">
+       <Alert className="max-w-md mx-auto">
           <Info className="h-4 w-4" />
           <AlertTitle>No Leased Numbers</AlertTitle>
           <AlertDescription>
-            You currently don&apos;t have any leased SMS numbers. Visit the &quot;Available Numbers&quot; tab to get started.
+            You currently don&apos;t have any leased SMS numbers. Visit the &quot;Available Numbers&quot; section above to get started.
           </AlertDescription>
         </Alert>
     );
   }
 
   return (
-    <div className="space-y-6 p-1">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
         {numbers.map((number) => (
           <NumberCard 
             key={number.id} 
@@ -86,7 +67,8 @@ export function MyNumbersList({ numbers: initialNumbers }: MyNumbersListProps) {
             onRenew={handleRenew}
             onUpdateComment={handleUpdateComment}
             onToggleAutoRenew={handleToggleAutoRenew}
-            onViewMessages={handleViewMessages}
+            onViewMessages={() => onSelectNumber(number)}
+            isCardSelected={number.id === selectedNumberId}
           />
         ))}
       </div>

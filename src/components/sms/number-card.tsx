@@ -1,13 +1,14 @@
+
 import type { AvailableSMSNumber, LeasedSMSNumber } from "@/types/sms";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Phone, CalendarDays, MessageSquare, Edit3, Save, RotateCcw } from 'lucide-react';
+import { Phone, CalendarDays, MessageSquare, Save, RotateCcw, ShoppingCart } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
+import { cn } from "@/lib/utils";
 
 interface NumberCardProps {
   number: AvailableSMSNumber | LeasedSMSNumber;
@@ -16,9 +17,18 @@ interface NumberCardProps {
   onUpdateComment?: (numberId: string, comment: string) => void;
   onToggleAutoRenew?: (numberId: string, autoRenew: boolean) => void;
   onViewMessages?: (number: LeasedSMSNumber) => void;
+  isCardSelected?: boolean;
 }
 
-export function NumberCard({ number, onLease, onRenew, onUpdateComment, onToggleAutoRenew, onViewMessages }: NumberCardProps) {
+export function NumberCard({ 
+  number, 
+  onLease, 
+  onRenew, 
+  onUpdateComment, 
+  onToggleAutoRenew, 
+  onViewMessages,
+  isCardSelected 
+}: NumberCardProps) {
   const isLeased = 'leasedUntil' in number;
 
   const handleCommentSave = (event: React.FormEvent<HTMLFormElement>) => {
@@ -30,8 +40,19 @@ export function NumberCard({ number, onLease, onRenew, onUpdateComment, onToggle
     }
   };
 
+  const cardAction = isLeased && onViewMessages 
+    ? () => onViewMessages(number as LeasedSMSNumber) 
+    : undefined;
+
   return (
-    <Card className="flex flex-col justify-between animate-fade-in shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card 
+      className={cn(
+        "flex flex-col justify-between animate-fade-in shadow-lg hover:shadow-xl transition-all duration-300",
+        isCardSelected && "ring-2 ring-primary shadow-2xl scale-[1.01]",
+        cardAction && "cursor-pointer"
+      )}
+      onClick={cardAction}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="font-headline text-xl flex items-center">
@@ -55,7 +76,7 @@ export function NumberCard({ number, onLease, onRenew, onUpdateComment, onToggle
               <MessageSquare className="w-4 h-4 mr-2" />
               Last activity: {formatDistanceToNow(parseISO((number as LeasedSMSNumber).lastActivity), { addSuffix: true })}
             </div>
-            <form onSubmit={handleCommentSave} className="space-y-2 pt-2">
+            <form onSubmit={handleCommentSave} onClick={(e) => e.stopPropagation()} className="space-y-2 pt-2">
               <Label htmlFor={`comment-${number.id}`}>Comment</Label>
               <div className="flex items-center space-x-2">
                 <Textarea 
@@ -71,7 +92,7 @@ export function NumberCard({ number, onLease, onRenew, onUpdateComment, onToggle
                 </Button>
               </div>
             </form>
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between pt-2" onClick={(e) => e.stopPropagation()}>
               <Label htmlFor={`autorenew-${number.id}`} className="flex items-center space-x-2 cursor-pointer">
                 <Switch 
                   id={`autorenew-${number.id}`} 
@@ -80,23 +101,24 @@ export function NumberCard({ number, onLease, onRenew, onUpdateComment, onToggle
                 />
                 <span>Auto-renew</span>
               </Label>
-              {onViewMessages && (
-                <Button variant="outline" size="sm" onClick={() => onViewMessages(number as LeasedSMSNumber)}>
+              {/* Button removed as card click handles it, but could be added back if specific UX is needed */}
+              {/* {onViewMessages && (
+                <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onViewMessages(number as LeasedSMSNumber); }}>
                   <MessageSquare className="w-4 h-4 mr-2" /> View Messages
                 </Button>
-              )}
+              )} */}
             </div>
           </>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter onClick={(e) => e.stopPropagation()}>
         {isLeased ? (
           <Button className="w-full" onClick={() => onRenew?.(number.id, 1 /* Default renew duration */)}>
             <RotateCcw className="w-4 h-4 mr-2" /> Renew Lease
           </Button>
         ) : (
           <Button className="w-full" onClick={() => onLease?.(number.id, (number.leaseDurationOptions[0] || 1))}>
-            Lease Number
+            <ShoppingCart className="w-4 h-4 mr-2" /> Lease Number
           </Button>
         )}
       </CardFooter>

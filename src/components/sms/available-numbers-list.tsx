@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { AvailableSMSNumber } from "@/types/sms";
@@ -35,7 +36,7 @@ export function AvailableNumbersList({ numbers: initialNumbers }: AvailableNumbe
     );
 
   return (
-    <div className="space-y-6 p-1">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4">
         <Input 
           placeholder="Search by country or phone number..."
@@ -59,7 +60,7 @@ export function AvailableNumbersList({ numbers: initialNumbers }: AvailableNumbe
       {filteredNumbers.length === 0 && (
         <p className="text-center text-muted-foreground py-8">No numbers match your criteria.</p>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8"> {/* 32px gap is gap-8 (8 * 4px) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
         {filteredNumbers.map((number) => (
           <NumberCard key={number.id} number={number} onLease={handleLease} />
         ))}
