@@ -2,14 +2,13 @@
 "use client";
 
 import { useState } from "react";
-import { AppHeader } from "@/components/layout/app-header"; // Removed ServiceType import
+import { AppHeader } from "@/components/layout/app-header";
 import { SmsPanel } from "@/components/sms/sms-panel";
 import { EsimPanel } from "@/components/esim/esim-panel";
 import { DashboardOverview } from "@/components/dashboard/dashboard-overview";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Added Tabs import
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Added ServiceType definition here as it's no longer from AppHeader
 export type ServiceType = "dashboard" | "sms" | "esim";
 
 export default function DashboardPage() {
@@ -23,15 +22,15 @@ export default function DashboardPage() {
         return <EsimPanel />;
       case "dashboard":
       default:
-        return <DashboardOverview />;
+        // Pass setActiveService to DashboardOverview
+        return <DashboardOverview setActiveService={setActiveService} />;
     }
   };
 
   return (
     <div className="flex flex-col h-screen">
-      <AppHeader /> {/* activeService and setActiveService props removed */}
+      <AppHeader />
       
-      {/* Tabs for service navigation moved into the page */}
       <div className="container pt-4 pb-2 border-b">
         <Tabs value={activeService} onValueChange={(value) => setActiveService(value as ServiceType)} className="w-full">
           <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-12 sm:h-auto">

@@ -1,3 +1,4 @@
+
 import type { ActiveESIMSubscription } from "@/types/esim";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { QrCode, CalendarOff, BarChart3, Info, DownloadCloud } from 'lucide-react';
 import { format, parseISO, formatDistanceToNow } from 'date-fns';
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 interface ActiveSubscriptionCardProps {
   subscription: ActiveESIMSubscription;
@@ -13,6 +15,14 @@ interface ActiveSubscriptionCardProps {
 
 export function ActiveSubscriptionCard({ subscription }: ActiveSubscriptionCardProps) {
   const dataUsedPercentage = (subscription.dataUsedGB / subscription.plan.dataAmountGB) * 100;
+  const { toast } = useToast();
+
+  const handleViewDetails = () => {
+    toast({
+      title: `Details for ${subscription.plan.planName} (Demo)`,
+      description: "This would show more details or management options for the subscription.",
+    });
+  };
 
   return (
     <Card className="animate-fade-in shadow-lg">
@@ -58,7 +68,7 @@ export function ActiveSubscriptionCard({ subscription }: ActiveSubscriptionCardP
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full" onClick={handleViewDetails}>
           <Info className="w-4 h-4 mr-2" /> View Details / Manage
         </Button>
       </CardFooter>

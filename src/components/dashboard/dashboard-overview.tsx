@@ -1,10 +1,13 @@
+
 "use client";
 
+import type { ServiceType } from "@/app/dashboard/page"; // Import ServiceType
 import { SmsRentalStatusChart } from "./sms-rental-status-chart";
 import { EsimUsageChart } from "./esim-usage-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChartHorizontalBig, Wifi, Users, ArrowUpRight } from "lucide-react";
 import { Button } from "../ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const StatCard = ({ title, value, icon: Icon, trend, description, period }: { title: string, value: string, icon: React.ElementType, trend?: string, description?: string, period?: string}) => (
   <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -21,8 +24,21 @@ const StatCard = ({ title, value, icon: Icon, trend, description, period }: { ti
   </Card>
 );
 
+// Add setActiveService to props
+interface DashboardOverviewProps {
+  setActiveService: (service: ServiceType) => void;
+}
 
-export function DashboardOverview() {
+export function DashboardOverview({ setActiveService }: DashboardOverviewProps) {
+  const { toast } = useToast();
+
+  const handleBillingHistory = () => {
+    toast({
+      title: "Billing History (Demo)",
+      description: "This would navigate to the billing history page.",
+    });
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -41,9 +57,9 @@ export function DashboardOverview() {
           <CardDescription>Manage your services efficiently.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <Button variant="outline" size="lg">Lease New SMS Number</Button>
-          <Button variant="outline" size="lg">Purchase eSIM Plan</Button>
-          <Button variant="outline" size="lg">View Billing History</Button>
+          <Button variant="outline" size="lg" onClick={() => setActiveService('sms')}>Lease New SMS Number</Button>
+          <Button variant="outline" size="lg" onClick={() => setActiveService('esim')}>Purchase eSIM Plan</Button>
+          <Button variant="outline" size="lg" onClick={handleBillingHistory}>View Billing History</Button>
         </CardContent>
       </Card>
     </div>

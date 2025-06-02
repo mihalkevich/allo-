@@ -10,6 +10,7 @@ import { Sun, Globe, Menu, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import type { ActiveServiceType } from '@/app/page';
+import { useToast } from "@/hooks/use-toast";
 
 interface PublicHeaderProps {
   activeService: ActiveServiceType;
@@ -18,11 +19,19 @@ interface PublicHeaderProps {
 
 export function PublicHeader({ activeService, setActiveService }: PublicHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { toast } = useToast();
 
   const navLinks = [
     { href: "/login", label: "Login" },
     { href: "/register", label: "Sign Up" },
   ];
+
+  const handleThemeToggle = () => {
+    toast({
+      title: "Theme Toggle (Demo)",
+      description: "Theme switching functionality is not yet implemented.",
+    });
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -59,7 +68,7 @@ export function PublicHeader({ activeService, setActiveService }: PublicHeaderPr
 
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
+            <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleThemeToggle}>
               <Sun className="h-5 w-5" />
               <span className="sr-only">Toggle theme</span>
             </Button>
@@ -113,7 +122,7 @@ export function PublicHeader({ activeService, setActiveService }: PublicHeaderPr
                     </Link>
                   ))}
                   <div className="mt-4 flex items-center justify-start gap-2 border-t pt-4">
-                     <Button variant="ghost" size="icon" className="h-9 w-9">
+                     <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleThemeToggle}>
                         <Sun className="h-5 w-5" />
                         <span className="sr-only">Toggle theme</span>
                       </Button>
