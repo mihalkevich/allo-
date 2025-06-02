@@ -8,42 +8,42 @@ const features = [
     icon: <ArrowRightLeft className="w-10 h-10" />,
     subTitle: "Two-way",
     title: "Calls and Messages",
-    description: "Communication from your new caller ID has no limits! Send or receive SMS and Calls on any device, anytime, anywhere.",
+    description: "Enjoy limitless communication with your new caller ID. Send and receive SMS or calls on any device, anywhere, anytime.",
   },
   {
     id: "payment",
     icon: <CreditCard className="w-10 h-10" />,
     subTitle: "Convenient",
     title: "Payment Options",
-    description: "Securely complete transactions with our versatile payment system, supporting both credit cards and popular digital payment methods.",
+    description: "Complete transactions securely with our versatile payment system, supporting credit cards and other popular digital methods.",
   },
   {
     id: "support",
     icon: <Headset className="w-10 h-10" />,
     subTitle: "24/7",
     title: "Customer Support",
-    description: "Have any questions? Contact us at the click of a button and we will get back to you before you know it!",
+    description: "Got questions? Reach out with a single click, and our team will get back to you promptly.",
   },
   {
     id: "transparent",
     icon: <FileText className="w-10 h-10" />,
     subTitle: "Transparent",
     title: "Conditions",
-    description: "Get virtual numbers at affordable prices with clear terms – no hidden costs, no roaming fees, just transparent conditions.",
+    description: "Access virtual numbers at affordable rates with clear, straightforward terms. No hidden fees, no roaming charges, just transparency.",
   },
   {
     id: "interface",
     icon: <Smartphone className="w-10 h-10" />,
     subTitle: "User-friendly",
     title: "Interface",
-    description: "With intuitive design and comprehensive multilingual support, you're one tap away from managing your numbers and messages.",
+    description: "Our intuitive design and multilingual support put convenient communication management just a tap away.",
   },
   {
     id: "setup",
     icon: <Zap className="w-10 h-10" />,
     subTitle: "Swift and Smooth",
     title: "Setup",
-    description: "Get your virtual SMS number or eSIM up and running in no time! Simply find your ideal plan/number and activate instantly.",
+    description: "Activate your eSIM or virtual number in no time. Choose your ideal plan from our diverse selection and get started instantly.",
   },
 ];
 
@@ -69,3 +69,4 @@ export function SmsFeaturesSection() {
     </section>
   );
 }
+
