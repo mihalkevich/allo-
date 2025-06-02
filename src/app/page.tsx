@@ -4,6 +4,7 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { CountrySearchSection } from "@/components/landing/country-search-section";
 import { PopularDestinationsSection } from "@/components/landing/popular-destinations-section";
 import { AdvancedFeaturesSection } from "@/components/landing/advanced-features-section";
+import { SmsFeaturesSection } from "@/components/landing/sms-features-section";
 import { ManageTrafficSection } from "@/components/landing/manage-traffic-section";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
 
@@ -15,6 +16,7 @@ export default function HomePage() {
         <CountrySearchSection />
         <PopularDestinationsSection />
         <AdvancedFeaturesSection />
+        <SmsFeaturesSection />
         <ManageTrafficSection />
         <TestimonialsSection />
       </main>
