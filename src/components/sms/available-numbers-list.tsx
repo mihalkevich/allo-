@@ -76,12 +76,12 @@ export function AvailableNumbersList({ numbers: initialNumbers, onConfirmLease }
       {filteredNumbers.length === 0 && (
         <p className="text-center text-muted-foreground py-8">No numbers match your criteria.</p>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredNumbers.map((number) => (
           <NumberCard 
             key={number.id} 
             number={number} 
-            onLease={handleAttemptLease} // Changed from onLease to handleAttemptLease
+            onLease={handleAttemptLease}
           />
         ))}
       </div>

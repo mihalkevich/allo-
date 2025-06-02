@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { LeasedSMSNumber, SMSMessage, AvailableSMSNumber } from "@/types/sms";
 import { mockAvailableNumbers, mockLeasedNumbers, mockSmsMessages } from "@/data/mock-sms";
 import { AvailableNumbersList } from "./available-numbers-list";
 import { MyNumbersList } from "./my-numbers-list";
 import { SMSHistoryView } from "./sms-history-view";
-import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Added CardContent
+import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessagesSquare, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,9 +19,53 @@ export function SmsPanel() {
   const [selectedNumber, setSelectedNumber] = useState<LeasedSMSNumber | null>(null);
   const [messages, setMessages] = useState<SMSMessage[]>([]);
 
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    if (selectedNumber) {
+      const simulateSms = () => {
+        const randomDelay = Math.floor(Math.random() * (20000 - 12000 + 1)) + 12000; // 12-20 seconds
+
+        intervalId = setTimeout(() => {
+          const newMockMessage: SMSMessage = {
+            id: `msg_${new Date().getTime()}_${Math.random().toString(36).substring(7)}`,
+            direction: "inbound",
+            sender: `+1-555-${Math.floor(Math.random() * 9000000) + 1000000}`, // Random sender
+            recipient: selectedNumber.phoneNumber,
+            content: `Simulated message: Your code is ${Math.floor(100000 + Math.random() * 900000)}. Received at ${new Date().toLocaleTimeString()}`,
+            timestamp: new Date().toISOString(),
+            status: "received",
+          };
+
+          setMessages((prevMessages) => [...prevMessages, newMockMessage]);
+          toast({
+            title: "New SMS Received (Demo)",
+            description: `From: ${newMockMessage.sender} for ${selectedNumber.phoneNumber}`,
+          });
+          
+          // Schedule next simulation
+          if (selectedNumber) { // Check again in case selectedNumber changed during timeout
+             simulateSms();
+          }
+        }, randomDelay);
+      };
+      simulateSms(); // Start the first simulation
+    }
+
+    return () => {
+      if (intervalId) {
+        clearTimeout(intervalId);
+      }
+    };
+  }, [selectedNumber, toast]);
+
+
   const handleSelectLeasedNumber = (number: LeasedSMSNumber) => {
     setSelectedNumber(number);
-    setMessages(mockSmsMessages[number.phoneNumber] || []);
+    // Initialize messages for the selected number, or use an empty array if none exist.
+    // This ensures that if mockSmsMessages doesn't have an entry, it doesn't crash.
+    const initialMessages = mockSmsMessages[number.phoneNumber] || [];
+    setMessages(initialMessages);
   };
 
   const handleCloseHistory = () => {

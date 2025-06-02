@@ -38,7 +38,6 @@ export function CountryFlagGridSelector({
 
   const handleCountryCardClick = (countryCode: string) => {
     onSelectCountry(countryCode);
-    // Keep the grid visible after selection from the grid
     setIsGridVisible(true); 
   };
 
@@ -66,7 +65,8 @@ export function CountryFlagGridSelector({
               )}
             >
               <CardContent className="flex flex-col items-center justify-center p-3 text-center aspect-[3/2] sm:aspect-square">
-                <span className="text-3xl mb-1.5 sm:text-4xl">{country.flag}</span>
+                {/* Increased flag size */}
+                <span className="text-5xl mb-2 sm:text-6xl">{country.flag}</span>
                 <p className="text-xs font-medium truncate w-full">{country.name}</p>
               </CardContent>
             </Card>
