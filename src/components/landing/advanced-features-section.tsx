@@ -5,7 +5,7 @@ const features = [
   {
     id: "feature1",
     title: "Global Coverage",
-    description: "Stay connected in over 190 countries with our reliable eSIM network.",
+    description: "Experience seamless connectivity in over 190 countries and regions. Our reliable eSIM network ensures you're always online, wherever your adventures take you.",
     imageUrl: "https://placehold.co/600x400.png",
     imageHint: "globe network"
   },
