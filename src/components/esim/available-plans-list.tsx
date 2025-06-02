@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ESIMPlan } from "@/types/esim";
@@ -6,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { useBalance } from "@/contexts/balance-context"; // Import useBalance
 
 interface AvailablePlansListProps {
   plans: ESIMPlan[];
@@ -13,16 +15,31 @@ interface AvailablePlansListProps {
 
 export function AvailablePlansList({ plans: initialPlans }: AvailablePlansListProps) {
   const { toast } = useToast();
+  const { balance, deductBalance, openTopUpModal } = useBalance(); // Use balance context
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
 
   const handlePurchase = (planId: string) => {
-    const plan = initialPlans.find(p => p.id === planId);
-    toast({
-      title: "Purchase Requested (Demo)",
-      description: `Purchasing ${plan?.planName} for ${plan?.country}.`,
-    });
-    console.log(`Purchase plan ${planId}`);
+    const planToPurchase = initialPlans.find(p => p.id === planId);
+    if (!planToPurchase) return;
+
+    const purchasePrice = planToPurchase.price;
+
+    if (deductBalance(purchasePrice)) {
+      toast({
+        title: "Purchase Successful (Demo)",
+        description: `Purchased ${planToPurchase.planName} for ${planToPurchase.country} at $${purchasePrice.toFixed(2)}. New balance: $${(balance - purchasePrice).toFixed(2)}`,
+      });
+      console.log(`Purchase plan ${planId}. Price: $${purchasePrice.toFixed(2)}`);
+      // In a real app, update active subscriptions or trigger a refetch
+    } else {
+      toast({
+        title: "Insufficient Funds",
+        description: `Your balance of $${balance.toFixed(2)} is not enough to purchase this plan for $${purchasePrice.toFixed(2)}. Please top up.`,
+        variant: "destructive",
+      });
+      openTopUpModal();
+    }
   };
 
   const uniqueCountries = ["all", ...new Set(initialPlans.map(plan => plan.country))];

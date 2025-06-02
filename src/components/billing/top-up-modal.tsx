@@ -20,15 +20,16 @@ import { useToast } from "@/hooks/use-toast";
 interface TopUpModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onConfirmTopUp: (amount: number) => void; // Changed to accept amount
 }
 
-export function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
+export function TopUpModal({ isOpen, onClose, onConfirmTopUp }: TopUpModalProps) {
   const [amount, setAmount] = useState<string>("10");
-  const { toast } = useToast();
+  const { toast } = useToast(); // Keep toast for validation messages
 
   const presetAmounts = [10, 20, 50, 100];
 
-  const handleTopUp = () => {
+  const handleConfirm = () => {
     const numericAmount = parseFloat(amount);
     if (isNaN(numericAmount) || numericAmount <= 0) {
       toast({
@@ -38,13 +39,8 @@ export function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
       });
       return;
     }
-    // Simulate API call
-    toast({
-      title: "Top Up Successful (Demo)",
-      description: `Successfully added $${numericAmount.toFixed(2)} to your balance.`,
-    });
-    console.log(`Topping up by $${numericAmount.toFixed(2)}`);
-    onClose(); // Close modal after successful top-up
+    onConfirmTopUp(numericAmount); // Call the passed function with the amount
+    // Toast for success will be handled by the BalanceContext
   };
 
   return (
@@ -90,7 +86,7 @@ export function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
           </div>
         </div>
         <DialogFooter className="sm:justify-start">
-          <Button type="button" onClick={handleTopUp} className="w-full sm:w-auto">
+          <Button type="button" onClick={handleConfirm} className="w-full sm:w-auto">
             Confirm Top Up
           </Button>
           <DialogClose asChild>

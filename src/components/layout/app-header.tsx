@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+// Removed useState for isTopUpModalOpen, it's now handled by BalanceContext
 import { AlloLogo } from '@/components/icons/allo-logo';
 import { LanguageSwitcher } from '@/components/shared/language-switcher';
 import { UserCircle, LogOut, Sun, Bell, Wallet, PlusCircle } from 'lucide-react';
@@ -16,11 +16,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TopUpModal } from '@/components/billing/top-up-modal'; // Import the modal
+// Removed TopUpModal import, it's now rendered by BalanceProvider
+import { useBalance } from '@/contexts/balance-context'; // Import useBalance
 
 export function AppHeader() {
   const router = useRouter();
-  const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
+  const { balance, openTopUpModal } = useBalance(); // Use balance and openTopUpModal from context
 
   const handleLogout = () => {
     console.log("User logged out");
@@ -40,9 +41,11 @@ export function AppHeader() {
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm font-medium">Balance: $10.00</span> {/* Placeholder Balance */}
+              {/* Display dynamic balance from context */}
+              <span className="text-sm font-medium">Balance: ${balance.toFixed(2)}</span> 
             </div>
-            <Button variant="outline" size="sm" onClick={() => setIsTopUpModalOpen(true)}>
+            {/* Call openTopUpModal from context */}
+            <Button variant="outline" size="sm" onClick={openTopUpModal}>
               <PlusCircle className="h-4 w-4 mr-1 sm:mr-2" />
               Top Up
             </Button>
@@ -80,7 +83,7 @@ export function AppHeader() {
           </div>
         </div>
       </header>
-      <TopUpModal isOpen={isTopUpModalOpen} onClose={() => setIsTopUpModalOpen(false)} />
+      {/* TopUpModal is no longer rendered here; it's in BalanceProvider */}
     </>
   );
 }

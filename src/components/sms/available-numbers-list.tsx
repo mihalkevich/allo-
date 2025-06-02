@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { useBalance } from "@/contexts/balance-context"; // Import useBalance
 
 interface AvailableNumbersListProps {
   numbers: AvailableSMSNumber[];
@@ -14,16 +15,31 @@ interface AvailableNumbersListProps {
 
 export function AvailableNumbersList({ numbers: initialNumbers }: AvailableNumbersListProps) {
   const { toast } = useToast();
+  const { balance, deductBalance, openTopUpModal } = useBalance(); // Use balance context
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
 
   const handleLease = (numberId: string, duration: number) => {
-    const number = initialNumbers.find(n => n.id === numberId);
-    toast({
-      title: "Lease Requested (Demo)",
-      description: `Leasing ${number?.phoneNumber} for ${duration} month(s).`,
-    });
-    console.log(`Lease number ${numberId} for ${duration} months`);
+    const numberToLease = initialNumbers.find(n => n.id === numberId);
+    if (!numberToLease) return;
+
+    const leasePrice = numberToLease.pricePerMonth * duration; // Assuming duration is in months
+
+    if (deductBalance(leasePrice)) {
+      toast({
+        title: "Lease Successful (Demo)",
+        description: `Leasing ${numberToLease.phoneNumber} for ${duration} month(s) at $${leasePrice.toFixed(2)}. New balance: $${(balance - leasePrice).toFixed(2)}`,
+      });
+      console.log(`Lease number ${numberId} for ${duration} months. Price: $${leasePrice.toFixed(2)}`);
+      // In a real app, update leased numbers list or trigger a refetch
+    } else {
+      toast({
+        title: "Insufficient Funds",
+        description: `Your balance of $${balance.toFixed(2)} is not enough to lease this number for $${leasePrice.toFixed(2)}. Please top up.`,
+        variant: "destructive",
+      });
+      openTopUpModal();
+    }
   };
   
   const uniqueCountries = ["all", ...new Set(initialNumbers.map(num => num.country))];
