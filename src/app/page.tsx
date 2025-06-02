@@ -7,9 +7,10 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { CountrySearchSection } from "@/components/landing/country-search-section";
 import { PopularDestinationsSection } from "@/components/landing/popular-destinations-section";
 import { AdvancedFeaturesSection } from "@/components/landing/advanced-features-section";
-import { SetupGuideSection } from "@/components/landing/setup-guide-section"; // Added import
+import { SetupGuideSection } from "@/components/landing/setup-guide-section";
 import { SmsFeaturesSection } from "@/components/landing/sms-features-section";
 import { ManageTrafficSection } from "@/components/landing/manage-traffic-section";
+import { DownloadAppSection } from "@/components/landing/download-app-section"; // Added import
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
 
 export type ActiveServiceType = 'mobile' | 'virtual';
@@ -33,11 +34,13 @@ export default function HomePage() {
         <CountrySearchSection />
         <PopularDestinationsSection />
         <AdvancedFeaturesSection />
-        <SetupGuideSection /> {/* Added new section */}
+        <SetupGuideSection />
         <SmsFeaturesSection />
         <ManageTrafficSection />
+        <DownloadAppSection /> {/* Added new section */}
         <TestimonialsSection />
       </main>
     </LandingLayout>
   );
 }
+
