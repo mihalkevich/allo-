@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { ServiceType } from "@/app/dashboard/page"; // Import ServiceType
+// import type { ServiceType } from "@/app/dashboard/page"; // No longer needed here
 import { SmsRentalStatusChart } from "./sms-rental-status-chart";
 import { EsimUsageChart } from "./esim-usage-chart";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,12 +24,12 @@ const StatCard = ({ title, value, icon: Icon, trend, description, period }: { ti
   </Card>
 );
 
-// Add setActiveService to props
+// setActiveService prop is removed as DashboardOverview is no longer directly controlling tabs
 interface DashboardOverviewProps {
-  setActiveService: (service: ServiceType) => void;
+  // setActiveService: (service: ServiceType) => void; // Removed
 }
 
-export function DashboardOverview({ setActiveService }: DashboardOverviewProps) {
+export function DashboardOverview({/* setActiveService */}: DashboardOverviewProps) { // Prop removed
   const { toast } = useToast();
 
   const handleBillingHistory = () => {
@@ -38,6 +38,25 @@ export function DashboardOverview({ setActiveService }: DashboardOverviewProps) 
       description: "This would navigate to the billing history page.",
     });
   };
+
+  // Quick Action buttons will need to be handled differently if DashboardOverview is used elsewhere
+  // For now, they will show toasts as they are not connected to tab switching.
+  const handleLeaseSms = () => {
+     toast({
+      title: "Lease SMS Number (Demo)",
+      description: "This would navigate to the SMS leasing section.",
+    });
+    // If this component were still managing tabs: setActiveService('sms');
+  };
+
+  const handlePurchaseEsim = () => {
+    toast({
+      title: "Purchase eSIM (Demo)",
+      description: "This would navigate to the eSIM purchasing section.",
+    });
+    // If this component were still managing tabs: setActiveService('esim');
+  };
+
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -57,11 +76,12 @@ export function DashboardOverview({ setActiveService }: DashboardOverviewProps) 
           <CardDescription>Manage your services efficiently.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <Button variant="outline" size="lg" onClick={() => setActiveService('sms')}>Lease New SMS Number</Button>
-          <Button variant="outline" size="lg" onClick={() => setActiveService('esim')}>Purchase eSIM Plan</Button>
+          <Button variant="outline" size="lg" onClick={handleLeaseSms}>Lease New SMS Number</Button>
+          <Button variant="outline" size="lg" onClick={handlePurchaseEsim}>Purchase eSIM Plan</Button>
           <Button variant="outline" size="lg" onClick={handleBillingHistory}>View Billing History</Button>
         </CardContent>
       </Card>
     </div>
   );
 }
+

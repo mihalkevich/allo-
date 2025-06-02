@@ -8,17 +8,22 @@ import { Input } from "@/components/ui/input";
 import { useState, useMemo } from "react";
 import { useBalance } from "@/contexts/balance-context";
 import { CountryFlagGridSelector, type CountryOption } from "@/components/shared/country-flag-grid-selector";
+import { Button } from "@/components/ui/button"; // Added Button import
+import { ChevronDown, ChevronUp } from "lucide-react"; // Added icon imports
 
 interface AvailableNumbersListProps {
   numbers: AvailableSMSNumber[];
   onConfirmLease: (numberId: string, duration: number) => void;
 }
 
+const INITIAL_DISPLAY_COUNT = 4;
+
 export function AvailableNumbersList({ numbers: initialNumbers, onConfirmLease }: AvailableNumbersListProps) {
   const { toast } = useToast();
   const { balance, deductBalance, openTopUpModal } = useBalance();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCountryCode, setSelectedCountryCode] = useState("all");
+  const [showAllNumbers, setShowAllNumbers] = useState(false);
 
   const handleAttemptLease = (numberId: string, duration: number) => {
     const numberToLease = initialNumbers.find(n => n.id === numberId);
@@ -28,7 +33,6 @@ export function AvailableNumbersList({ numbers: initialNumbers, onConfirmLease }
 
     if (deductBalance(leasePrice)) {
       onConfirmLease(numberId, duration);
-      // Success toast will be handled by SmsPanel after list update
     } else {
       toast({
         title: "Insufficient Funds",
@@ -49,7 +53,7 @@ export function AvailableNumbersList({ numbers: initialNumbers, onConfirmLease }
     return Array.from(countryDataMap.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [initialNumbers]);
 
-  const filteredNumbers = useMemo(() => {
+  const baseFilteredNumbers = useMemo(() => {
     return initialNumbers
       .filter(num => selectedCountryCode === "all" || num.countryCode === selectedCountryCode)
       .filter(num => 
@@ -57,6 +61,13 @@ export function AvailableNumbersList({ numbers: initialNumbers, onConfirmLease }
         num.phoneNumber.includes(searchTerm)
       );
   }, [initialNumbers, selectedCountryCode, searchTerm]);
+
+  const numbersToDisplay = useMemo(() => {
+    if (showAllNumbers) {
+      return baseFilteredNumbers;
+    }
+    return baseFilteredNumbers.slice(0, INITIAL_DISPLAY_COUNT);
+  }, [baseFilteredNumbers, showAllNumbers]);
 
   return (
     <div className="space-y-6">
@@ -73,11 +84,11 @@ export function AvailableNumbersList({ numbers: initialNumbers, onConfirmLease }
         selectedCountry={selectedCountryCode}
         onSelectCountry={setSelectedCountryCode}
       />
-      {filteredNumbers.length === 0 && (
+      {numbersToDisplay.length === 0 && baseFilteredNumbers.length === 0 && ( // Check baseFilteredNumbers too for more accurate "no results"
         <p className="text-center text-muted-foreground py-8">No numbers match your criteria.</p>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredNumbers.map((number) => (
+        {numbersToDisplay.map((number) => (
           <NumberCard 
             key={number.id} 
             number={number} 
@@ -85,6 +96,23 @@ export function AvailableNumbersList({ numbers: initialNumbers, onConfirmLease }
           />
         ))}
       </div>
+      {baseFilteredNumbers.length > INITIAL_DISPLAY_COUNT && (
+        <div className="flex justify-center mt-6">
+          <Button
+            variant="outline"
+            onClick={() => setShowAllNumbers(!showAllNumbers)}
+            className="shadow-sm hover:shadow-md transition-shadow"
+          >
+            {showAllNumbers ? "Show Fewer Numbers" : `Show All ${baseFilteredNumbers.length} Numbers`}
+            {showAllNumbers ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
+          </Button>
+        </div>
+      )}
+       {numbersToDisplay.length === 0 && baseFilteredNumbers.length > 0 && (
+         <p className="text-center text-muted-foreground py-8">
+           All matching numbers are hidden. Click "Show All {baseFilteredNumbers.length} Numbers" to see them.
+         </p>
+       )}
     </div>
   );
 }
