@@ -7,7 +7,7 @@ import { mockAvailableNumbers, mockLeasedNumbers, mockSmsMessages } from "@/data
 import { AvailableNumbersList } from "./available-numbers-list";
 import { MyNumbersList } from "./my-numbers-list";
 import { SMSHistoryView } from "./sms-history-view";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Added CardContent
 import { MessagesSquare, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -44,7 +44,7 @@ export function SmsPanel() {
       lastActivity: new Date().toISOString(),
     };
 
-    setMyLeasedNumbers(prev => [newLeasedNumber, ...prev]);
+    setMyLeasedNumbers(prev => [newLeasedNumber, ...prev].sort((a,b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime() ));
     setAllAvailableNumbers(prev => prev.filter(n => n.id !== numberId));
 
     toast({
@@ -55,38 +55,38 @@ export function SmsPanel() {
 
   const handleRenewLeasedNumber = (numberId: string, duration: number) => {
     const number = myLeasedNumbers.find(n => n.id === numberId);
-    // In a real app, this would update the leasedUntil date and potentially involve a new transaction.
-    // For demo, we'll just toast.
+    if (!number) return;
+    
+    setMyLeasedNumbers(prev => prev.map(n => {
+      if (n.id === numberId) {
+        const currentExpiry = new Date(n.leasedUntil);
+        const newExpiry = new Date(currentExpiry.setMonth(currentExpiry.getMonth() + duration));
+        return { ...n, leasedUntil: newExpiry.toISOString() };
+      }
+      return n;
+    }));
+
     toast({
       title: "Renew Requested (Demo)",
-      description: `Renewing ${number?.phoneNumber} for ${duration} month(s).`,
+      description: `Renewing ${number.phoneNumber} for ${duration} month(s). New expiry: ${new Date(new Date(number.leasedUntil).setMonth(new Date(number.leasedUntil).getMonth() + duration)).toLocaleDateString()}`,
     });
-    // Example of updating leasedUntil if you want to simulate it:
-    // setMyLeasedNumbers(prev => prev.map(n => {
-    //   if (n.id === numberId) {
-    //     const currentExpiry = new Date(n.leasedUntil);
-    //     const newExpiry = new Date(currentExpiry.setMonth(currentExpiry.getMonth() + duration));
-    //     return { ...n, leasedUntil: newExpiry.toISOString() };
-    //   }
-    //   return n;
-    // }));
   };
 
   const handleUpdateLeasedNumberComment = (numberId: string, comment: string) => {
     setMyLeasedNumbers(prev => prev.map(n => n.id === numberId ? { ...n, comment } : n));
-    const number = myLeasedNumbers.find(n => n.id === numberId); // Find after update for accurate toast
+    const updatedNumber = myLeasedNumbers.find(n => n.id === numberId);
     toast({
       title: "Comment Updated",
-      description: `Comment for ${number?.phoneNumber} updated.`,
+      description: `Comment for ${updatedNumber?.phoneNumber} updated.`,
     });
   };
 
   const handleToggleLeasedNumberAutoRenew = (numberId: string, autoRenew: boolean) => {
     setMyLeasedNumbers(prev => prev.map(n => n.id === numberId ? { ...n, autoRenew } : n));
-    const number = myLeasedNumbers.find(n => n.id === numberId); // Find after update for accurate toast
+    const updatedNumber = myLeasedNumbers.find(n => n.id === numberId);
     toast({
       title: "Auto-Renew Updated",
-      description: `Auto-renew for ${number?.phoneNumber} set to ${autoRenew}.`,
+      description: `Auto-renew for ${updatedNumber?.phoneNumber} set to ${autoRenew ? 'ON' : 'OFF'}.`,
     });
   };
 
