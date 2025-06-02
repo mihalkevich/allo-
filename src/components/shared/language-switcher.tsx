@@ -31,8 +31,10 @@ export function LanguageSwitcher() {
         <DropdownMenuRadioGroup value={language} onValueChange={setLanguage}>
           <DropdownMenuRadioItem value="en">English (EN)</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="ru">Русский (RU)</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="es">Español (ES)</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
+
