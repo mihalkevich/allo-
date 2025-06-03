@@ -1,10 +1,11 @@
+
 "use client";
 
 import type { LeasedSMSNumber, SMSMessage } from "@/types/sms";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Send, Inbox } from "lucide-react";
+import { Send, Inbox, RefreshCw } from "lucide-react"; // Added RefreshCw
 import { format, parseISO } from 'date-fns';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -14,25 +15,38 @@ import { useToast } from "@/hooks/use-toast";
 interface SMSHistoryViewProps {
   number: LeasedSMSNumber;
   messages: SMSMessage[];
-  onClose: () => void;
+  onSendMessage: (messageContent: string) => void;
+  // onClose: () => void; // Can be removed if panel is always part of layout when number selected
 }
 
-export function SMSHistoryView({ number, messages, onClose }: SMSHistoryViewProps) {
+export function SMSHistoryView({ number, messages, onSendMessage }: SMSHistoryViewProps) {
   const { toast } = useToast();
 
-  const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const messageContent = formData.get('messageContent') as string;
     if (messageContent.trim()) {
-       toast({
-        title: "Message Sent (Demo)",
-        description: `To: ${number.phoneNumber}, Message: ${messageContent}`,
-      });
-      console.log(`Sending message "${messageContent}" from ${number.phoneNumber}`);
-      // Reset form or add message to list optimistically
+      onSendMessage(messageContent);
       (event.target as HTMLFormElement).reset();
     }
+  };
+
+  const handleRefresh = () => {
+    toast({
+      title: "Messages Refreshed (Demo)",
+      description: `Simulating refresh for ${number.phoneNumber}.`,
+    });
+    // In a real app, this would trigger a refetch of messages
+  };
+
+  // Helper function to get flag for a phone number (very basic, assumes US for unknown)
+  const getFlagForNumber = (phoneNumber: string): string => {
+    // This is a placeholder. In a real app, you might have a library or more complex logic.
+    // For this demo, it will use the selected number's flag.
+    // If you can derive country code from number, you can map to flag.
+    if (phoneNumber === number.phoneNumber) return number.flag; // For "to" or "from" being the leased number
+    return "🏳️"; // Default flag for external numbers
   };
 
 
@@ -41,47 +55,62 @@ export function SMSHistoryView({ number, messages, onClose }: SMSHistoryViewProp
       <Card className="shadow-lg">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <Button variant="ghost" size="icon" onClick={onClose} aria-label="Back to my numbers">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
+            {/* Spacer to balance the refresh button */}
+            <div className="w-8 h-8"></div> 
             <div className="text-center flex-grow">
-              <CardTitle className="font-headline text-xl">SMS History</CardTitle>
+              <CardTitle className="font-headline text-xl">Incoming Messages</CardTitle>
               <CardDescription>{number.flag} {number.phoneNumber}</CardDescription>
             </div>
-            <div className="w-10"></div> {/* Spacer */}
+            <Button variant="ghost" size="icon" onClick={handleRefresh} aria-label="Refresh messages" className="h-8 w-8">
+              <RefreshCw className="w-4 h-4" />
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[400px] border rounded-md p-4 mb-4">
+          <ScrollArea className="h-[400px] border rounded-md p-3 mb-4"> {/* Adjusted padding */}
             {messages.length === 0 ? (
-              <p className="text-center text-muted-foreground">No messages yet.</p>
+              <p className="text-center text-muted-foreground py-4">No messages yet.</p>
             ) : (
-              <div className="space-y-4">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={cn(
-                      "flex flex-col p-3 rounded-lg max-w-[75%]",
-                      msg.direction === "outbound"
-                        ? "bg-primary text-primary-foreground self-end items-end"
-                        : "bg-secondary text-secondary-foreground self-start items-start"
-                    )}
-                  >
-                    <p className="text-sm">{msg.content}</p>
-                    <span className="text-xs opacity-80 mt-1">
-                      {format(parseISO(msg.timestamp), "MMM d, HH:mm")}
-                      {msg.direction === "outbound" && ` (${msg.status})`}
-                    </span>
-                    <Badge variant={msg.direction === "outbound" ? "default" : "secondary"} className="mt-1 capitalize text-xs px-1.5 py-0.5">
-                      {msg.direction === "outbound" ? <Send className="w-3 h-3 mr-1" /> : <Inbox className="w-3 h-3 mr-1" />}
-                      {msg.direction}
-                    </Badge>
-                  </div>
-                ))}
+              <div className="space-y-3">
+                {messages.map((msg) => {
+                  const isOutbound = msg.direction === "outbound";
+                  const senderDisplay = isOutbound ? number.phoneNumber : msg.sender;
+                  const recipientDisplay = isOutbound ? msg.recipient : number.phoneNumber;
+                  // Basic flag logic, assumes selected number's flag for its own messages
+                  const senderFlag = isOutbound ? number.flag : getFlagForNumber(msg.sender); 
+                  const recipientFlag = isOutbound ? getFlagForNumber(msg.recipient) : number.flag;
+
+
+                  return (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        "flex flex-col p-2.5 rounded-lg w-full", // Use w-full and let content determine width
+                        // isOutbound ? "bg-primary text-primary-foreground self-end items-end ml-auto max-w-[85%]" : "bg-secondary text-secondary-foreground self-start items-start mr-auto max-w-[85%]"
+                         isOutbound ? "bg-primary text-primary-foreground ml-auto" : "bg-muted dark:bg-secondary", // Simplified for screenshot style
+                         "max-w-[85%]" // Ensure bubbles don't take full width
+                      )}
+                    >
+                      <div className="flex justify-between items-center text-xs opacity-90 mb-1">
+                        {isOutbound ? (
+                            <span>to: {recipientFlag} {recipientDisplay}</span>
+                        ) : (
+                            <span>from: {senderFlag} {senderDisplay}</span>
+                        )}
+                        <span>{format(parseISO(msg.timestamp), "dd.MM")}</span>
+                      </div>
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                      {/* Optional: Status for outbound messages if needed */}
+                      {isOutbound && msg.status !== 'received' && (
+                        <span className="text-xs opacity-70 mt-1 self-end">{msg.status}</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </ScrollArea>
-          <form onSubmit={handleSendMessage} className="space-y-2">
+          <form onSubmit={handleFormSubmit} className="space-y-2">
             <Textarea 
               name="messageContent"
               placeholder="Type your message..."
