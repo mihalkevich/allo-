@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,12 +17,12 @@ export function EsimPanel() {
   return (
     <div className="animate-fade-in">
       <Tabs defaultValue="available-plans" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6">
-          <TabsTrigger value="available-plans" className="py-3 text-base">
-            <Search className="w-5 h-5 mr-2" /> Available Plans
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 mb-6 sm:max-w-md sm:mx-auto">
+          <TabsTrigger value="available-plans" className="py-2.5 text-sm font-medium">
+            <Search className="w-4 h-4 mr-2" /> Available Plans
           </TabsTrigger>
-          <TabsTrigger value="my-subscriptions" className="py-3 text-base">
-            <ListChecks className="w-5 h-5 mr-2" /> My Subscriptions
+          <TabsTrigger value="my-subscriptions" className="py-2.5 text-sm font-medium">
+            <ListChecks className="w-4 h-4 mr-2" /> My Subscriptions
           </TabsTrigger>
         </TabsList>
         <TabsContent value="available-plans">
@@ -37,7 +38,7 @@ export function EsimPanel() {
               </AlertDescription>
             </Alert>
           ) : (
-            <div className="space-y-8"> {/* 32px gap */}
+            <div className="space-y-6">
               {activeSubscriptions.map((sub) => (
                 <ActiveSubscriptionCard key={sub.id} subscription={sub} />
               ))}
@@ -48,3 +49,4 @@ export function EsimPanel() {
     </div>
   );
 }
+

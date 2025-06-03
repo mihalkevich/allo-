@@ -16,8 +16,6 @@ export function SmsPanel() {
   const { toast } = useToast();
   const [allAvailableNumbers, setAllAvailableNumbers] = useState<AvailableSMSNumber[]>(mockAvailableNumbers);
   const [myLeasedNumbers, setMyLeasedNumbers] = useState<LeasedSMSNumber[]>(mockLeasedNumbers);
-
-  // Initialize selectedNumber to null
   const [selectedNumber, setSelectedNumber] = useState<LeasedSMSNumber | null>(null);
   const [messages, setMessages] = useState<SMSMessage[]>([]);
 
@@ -26,7 +24,7 @@ export function SmsPanel() {
       const initialMessages = mockSmsMessages[selectedNumber.phoneNumber] || [];
       setMessages(initialMessages);
     } else {
-      setMessages([]); // Clear messages if no number is selected
+      setMessages([]); 
     }
   }, [selectedNumber]);
 
@@ -39,6 +37,8 @@ export function SmsPanel() {
         const randomDelay = Math.floor(Math.random() * (20000 - 12000 + 1)) + 12000; 
 
         intervalId = setTimeout(() => {
+          if (!selectedNumber) return; // Check if selectedNumber is still valid
+
           const newMockMessage: SMSMessage = {
             id: `msg_${new Date().getTime()}_${Math.random().toString(36).substring(7)}`,
             direction: "inbound",
@@ -48,19 +48,16 @@ export function SmsPanel() {
             timestamp: new Date().toISOString(),
             status: "received",
           };
-
-          // Only add message and toast if it's for the currently selected number
+          
           setMessages((prevMessages) => {
-            // Check if the message is for the currently selected number's context
-            // For inbound, recipient should be selectedNumber.phoneNumber
-            if (newMockMessage.recipient === selectedNumber.phoneNumber) {
+             if (selectedNumber && newMockMessage.recipient === selectedNumber.phoneNumber) {
                  toast({
                     title: "New SMS Received (Demo)",
                     description: `From: ${newMockMessage.sender} for ${selectedNumber.phoneNumber}`,
                  });
                 return [...prevMessages, newMockMessage];
             }
-            return prevMessages; // Don't add if not for current context
+            return prevMessages;
           });
           
           if (selectedNumber) { 
@@ -95,10 +92,9 @@ export function SmsPanel() {
       leasedUntil: new Date(Date.now() + duration * 30 * 24 * 60 * 60 * 1000).toISOString(),
       autoRenew: false,
       comment: "",
-      lastActivity: new Date().toISOString(),
     };
 
-    setMyLeasedNumbers(prev => [newLeasedNumber, ...prev].sort((a,b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime() ));
+    setMyLeasedNumbers(prev => [newLeasedNumber, ...prev].sort((a,b) => new Date(b.leasedUntil).getTime() - new Date(a.leasedUntil).getTime() ));
     setAllAvailableNumbers(prev => prev.filter(n => n.id !== numberId));
 
     toast({
@@ -151,13 +147,12 @@ export function SmsPanel() {
       id: `msg_sent_${new Date().getTime()}`,
       direction: 'outbound',
       sender: selectedNumber.phoneNumber,
-      recipient: '+10000000000', // Placeholder for recipient, ideally user input
+      recipient: '+10000000000', 
       content: messageContent,
       timestamp: new Date().toISOString(),
-      status: 'sent', // Initial status
+      status: 'sent', 
     };
     setMessages(prev => [...prev, newMessage]);
-    // Simulate delivery confirmation
     setTimeout(() => {
       setMessages(prev => prev.map(m => m.id === newMessage.id ? {...m, status: 'delivered'} : m));
     }, 1500);
@@ -168,13 +163,12 @@ export function SmsPanel() {
   };
 
   return (
-    <div className="animate-fade-in grid grid-cols-1 lg:grid-cols-3 gap-6"> {/* Adjusted gap */}
-      {/* Left Column */}
-      <div className="lg:col-span-2 space-y-8"> {/* Adjusted space-y */}
+    <div className="animate-fade-in grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 space-y-8">
         <section id="available-numbers">
           <div className="flex items-center mb-4">
-            <Search className="w-5 h-5 mr-2.5 text-primary" /> {/* Adjusted icon size & margin */}
-            <h2 className="text-xl font-semibold tracking-tight">Available Numbers to Lease</h2> {/* Adjusted text size */}
+            <Search className="w-5 h-5 mr-2 text-primary" />
+            <h2 className="text-xl font-semibold tracking-tight">Available Numbers to Lease</h2>
           </div>
           <AvailableNumbersList
             numbers={allAvailableNumbers}
@@ -184,8 +178,8 @@ export function SmsPanel() {
 
         <section id="my-numbers">
           <div className="flex items-center mb-4">
-            <PhoneOutgoing className="w-5 h-5 mr-2.5 text-primary" /> {/* Adjusted icon size & margin */}
-            <h2 className="text-xl font-semibold tracking-tight">My Numbers</h2> {/* Adjusted text size */}
+            <PhoneOutgoing className="w-5 h-5 mr-2 text-primary" />
+            <h2 className="text-xl font-semibold tracking-tight">My Numbers</h2>
           </div>
           <MyNumbersList
             numbers={myLeasedNumbers}
@@ -198,9 +192,8 @@ export function SmsPanel() {
         </section>
       </div>
 
-      {/* Right Column (Sticky) */}
       <div className="lg:col-span-1">
-        <div className="sticky top-20"> {/* Adjusted sticky top position */}
+        <div className="sticky top-20"> 
           {selectedNumber ? (
             <SMSHistoryView
               number={selectedNumber}
@@ -210,13 +203,13 @@ export function SmsPanel() {
           ) : (
             <Card className="shadow-lg">
               <CardHeader className="p-4">
-                <CardTitle className="font-headline text-lg">Incoming Messages</CardTitle> {/* Adjusted text size */}
-                <CardDescription className="text-sm">Select one of your numbers to view its messages.</CardDescription> {/* Adjusted text size */}
+                <CardTitle className="font-headline text-lg">Incoming Messages</CardTitle>
+                <CardDescription className="text-sm">Select one of your numbers to view its messages.</CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col items-center justify-center h-[300px] text-center p-4"> {/* Adjusted height & padding */}
-                <MessagesSquare className="w-12 h-12 text-muted-foreground mb-3" /> {/* Adjusted icon size & margin */}
-                <p className="text-muted-foreground text-sm">No number selected.</p> {/* Adjusted text size */}
-                <p className="text-xs text-muted-foreground mt-1">Click on a number from &quot;My Numbers&quot; list to see its history here.</p> {/* Adjusted text size */}
+              <CardContent className="flex flex-col items-center justify-center h-[360px] text-center p-4"> 
+                <MessagesSquare className="w-12 h-12 text-muted-foreground mb-3" />
+                <p className="text-muted-foreground text-sm">No number selected.</p>
+                <p className="text-xs text-muted-foreground mt-1">Click on a number from &quot;My Numbers&quot; list to see its history here.</p>
               </CardContent>
             </Card>
           )}
@@ -225,3 +218,4 @@ export function SmsPanel() {
     </div>
   );
 }
+
