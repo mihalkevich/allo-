@@ -37,7 +37,7 @@ export function CountrySearchSection() {
           <div className="mb-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
             <span>Popular:</span>
             {popularCountries.map((country) => (
-              <Link key={country.code} href={`/esim/${country.code}`} className="hover:text-primary hover:underline">
+              <Link key={country.code} href="/register" className="hover:text-primary hover:underline">
                 <span className="mr-1">{country.flag}</span>{country.name}
               </Link>
             ))}
