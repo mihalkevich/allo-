@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface BalanceContextType {
   balance: number;
-  topUpBalance: (amount: number) => void;
+  topUpBalance: (amount: number, paymentMethod: string) => void;
   deductBalance: (amount: number) => boolean;
   isTopUpModalOpen: boolean;
   openTopUpModal: () => void;
@@ -20,16 +20,23 @@ const BalanceContext = createContext<BalanceContextType | undefined>(undefined);
 // Initial balance for demo purposes
 const INITIAL_BALANCE = 20; 
 
+const paymentMethodLabels: Record<string, string> = {
+  card: "Credit/Debit Card",
+  crypto: "Cryptocurrency",
+  stars: "Stars",
+};
+
 export function BalanceProvider({ children }: { children: ReactNode }) {
   const [balance, setBalance] = useState<number>(INITIAL_BALANCE);
   const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
   const { toast } = useToast();
 
-  const topUpBalance = useCallback((amount: number) => {
+  const topUpBalance = useCallback((amount: number, paymentMethod: string) => {
     setBalance((prevBalance) => prevBalance + amount);
+    const methodLabel = paymentMethodLabels[paymentMethod] || "Selected Method";
     toast({
       title: "Top Up Successful (Demo)",
-      description: `Successfully added $${amount.toFixed(2)} to your balance. New balance: $${(balance + amount).toFixed(2)}`,
+      description: `Successfully added $${amount.toFixed(2)} using ${methodLabel}. New balance: $${(balance + amount).toFixed(2)}`,
     });
     setIsTopUpModalOpen(false);
   }, [toast, balance]);
@@ -65,7 +72,7 @@ export function BalanceProvider({ children }: { children: ReactNode }) {
       <TopUpModal
         isOpen={isTopUpModalOpen}
         onClose={closeTopUpModal}
-        onConfirmTopUp={topUpBalance} // Pass the context's topUpBalance function
+        onConfirmTopUp={topUpBalance}
       />
     </BalanceContext.Provider>
   );

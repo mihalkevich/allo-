@@ -14,18 +14,26 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DollarSign, CreditCard } from "lucide-react";
+import { DollarSign, CreditCard, CircleDollarSign, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface TopUpModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirmTopUp: (amount: number) => void; // Changed to accept amount
+  onConfirmTopUp: (amount: number, paymentMethod: string) => void;
 }
+
+const paymentMethods = [
+  { id: 'card', label: 'Credit/Debit Card', icon: <CreditCard className="mr-2 h-5 w-5" /> },
+  { id: 'crypto', label: 'Cryptocurrency', icon: <CircleDollarSign className="mr-2 h-5 w-5" /> },
+  { id: 'stars', label: 'Stars', icon: <Star className="mr-2 h-5 w-5" /> },
+];
 
 export function TopUpModal({ isOpen, onClose, onConfirmTopUp }: TopUpModalProps) {
   const [amount, setAmount] = useState<string>("10");
-  const { toast } = useToast(); // Keep toast for validation messages
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(paymentMethods[0].id);
+  const { toast } = useToast();
 
   const presetAmounts = [10, 20, 50, 100];
 
@@ -39,8 +47,15 @@ export function TopUpModal({ isOpen, onClose, onConfirmTopUp }: TopUpModalProps)
       });
       return;
     }
-    onConfirmTopUp(numericAmount); // Call the passed function with the amount
-    // Toast for success will be handled by the BalanceContext
+    if (!selectedPaymentMethod) {
+      toast({
+        title: "Payment Method Required",
+        description: "Please select a payment method.",
+        variant: "destructive",
+      });
+      return;
+    }
+    onConfirmTopUp(numericAmount, selectedPaymentMethod);
   };
 
   return (
@@ -51,10 +66,10 @@ export function TopUpModal({ isOpen, onClose, onConfirmTopUp }: TopUpModalProps)
             <CreditCard className="mr-2 h-5 w-5" /> Top Up Your Balance
           </DialogTitle>
           <DialogDescription>
-            Select or enter an amount to add to your account balance.
+            Select an amount and payment method to add to your account balance.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-2">
+        <div className="space-y-6 py-2">
           <div className="space-y-2">
             <Label htmlFor="amount">Amount (USD)</Label>
             <div className="relative">
@@ -84,8 +99,25 @@ export function TopUpModal({ isOpen, onClose, onConfirmTopUp }: TopUpModalProps)
               ))}
             </div>
           </div>
+
+          <div className="space-y-3">
+            <Label>Payment Method</Label>
+            <RadioGroup value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod} className="gap-3">
+              {paymentMethods.map((method) => (
+                <Label
+                  key={method.id}
+                  htmlFor={`payment-${method.id}`}
+                  className="flex items-center space-x-3 rounded-md border border-muted p-3 hover:border-primary transition-colors cursor-pointer has-[input:checked]:border-primary has-[input:checked]:ring-1 has-[input:checked]:ring-primary"
+                >
+                  <RadioGroupItem value={method.id} id={`payment-${method.id}`} />
+                  {method.icon}
+                  <span>{method.label}</span>
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
         </div>
-        <DialogFooter className="sm:justify-start">
+        <DialogFooter className="sm:justify-start pt-2">
           <Button type="button" onClick={handleConfirm} className="w-full sm:w-auto">
             Confirm Top Up
           </Button>
