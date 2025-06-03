@@ -72,10 +72,7 @@ export function NumberCard({
               <CalendarDays className="w-4 h-4 mr-2" />
               Leased until: {formatDistanceToNow(parseISO((number as LeasedSMSNumber).leasedUntil), { addSuffix: true })}
             </div>
-            <div className="text-sm text-muted-foreground flex items-center">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Last activity: {formatDistanceToNow(parseISO((number as LeasedSMSNumber).lastActivity), { addSuffix: true })}
-            </div>
+            {/* Last activity removed from here */}
             <form onSubmit={handleCommentSave} onClick={(e) => e.stopPropagation()} className="space-y-2 pt-2">
               <Label htmlFor={`comment-${number.id}`}>Comment</Label>
               <div className="flex items-center space-x-2">
@@ -101,12 +98,6 @@ export function NumberCard({
                 />
                 <span>Auto-renew</span>
               </Label>
-              {/* Button removed as card click handles it, but could be added back if specific UX is needed */}
-              {/* {onViewMessages && (
-                <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); onViewMessages(number as LeasedSMSNumber); }}>
-                  <MessageSquare className="w-4 h-4 mr-2" /> View Messages
-                </Button>
-              )} */}
             </div>
           </>
         )}
