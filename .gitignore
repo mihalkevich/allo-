@@ -5,3 +5,4 @@ build/
 .next/
 
 __pycache__/
+docs/campaign/_chunks/
