@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Дашборд подготовки · НЕЙРОСЕТИ. 10 ЛЕТ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A; --bg2:#101010; --panel:#141418; --panel2:#1A1A20;
+  --line:#2A2A33; --text:#FFFFFF; --muted:#AFAFAF; --muted2:#7C7F9A;
+  --purple:#7013CD; --purple-l:#AC59FF; --purple-e:#6E50FF; --purple-d:#541EB8;
+  --yellow:#FFF705; --green:#3FCF8E; --red:#FF4D4F; --grey:#5B5F6B;
+  --rise:34px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);
+  font-family:'Raleway',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+body{line-height:1.5;padding-bottom:60px}
+h1,h2,h3{font-weight:700;line-height:1.15}
+a{color:var(--purple-l);text-decoration:none}
+.bebas{font-family:'Bebas Neue','Raleway',sans-serif;font-weight:400;letter-spacing:.02em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ---- header ---- */
+.top{position:sticky;top:0;z-index:50;background:rgba(10,10,10,.92);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding-top:14px;padding-bottom:14px}
+.logo{display:flex;align-items:baseline;gap:10px}
+.logo .mark{font-size:30px;line-height:1;letter-spacing:.06em}
+.logo .mark b{color:var(--yellow)}
+.logo .tag{font-size:11px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.14em;font-weight:600}
+.hdr-cd{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted)}
+.hdr-cd b{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--yellow);
+  letter-spacing:.03em}
+
+/* ---- section frame ---- */
+section{margin-top:34px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.sec-h h2{font-size:15px;text-transform:uppercase;letter-spacing:.16em;
+  color:var(--muted)}
+.sec-h .line{flex:1;height:1px;background:var(--line)}
+
+/* ---- hero countdown ---- */
+.hero{margin-top:26px;border-radius:20px;overflow:hidden;border:1px solid var(--line);
+  background:
+    radial-gradient(900px 360px at 12% -10%,rgba(112,19,205,.55),transparent 70%),
+    radial-gradient(700px 380px at 100% 120%,rgba(110,80,255,.40),transparent 70%),
+    linear-gradient(180deg,#15101F,#0C0A12)}
+.hero-in{padding:34px 30px}
+.hero .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--purple-l);font-weight:700}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-weight:400;letter-spacing:.02em;
+  font-size:clamp(40px,7vw,76px);margin:6px 0 2px}
+.hero .meta{color:var(--muted);font-size:15px;font-weight:500}
+.hero .meta b{color:var(--text)}
+.cd{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}
+.cd-cell{background:rgba(0,0,0,.45);border:1px solid var(--line);border-radius:14px;
+  padding:14px 6px;min-width:108px;flex:1;text-align:center}
+.cd-cell .num{font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,8vw,72px);
+  line-height:.95;color:var(--yellow)}
+.cd-cell .lbl{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-top:6px;font-weight:600}
+.cd-foot{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:18px;
+  font-size:13.5px;color:var(--muted)}
+.cd-foot .chip{display:flex;align-items:center;gap:8px}
+.cd-foot b{color:var(--text)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+
+/* ---- overall progress ---- */
+.overall{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+.ov-big{display:flex;align-items:center;gap:20px}
+.ov-pct{font-family:'Bebas Neue',sans-serif;font-size:84px;line-height:.85;color:var(--text)}
+.ov-pct small{font-size:30px;color:var(--muted)}
+.bar{height:12px;border-radius:7px;background:var(--panel2);overflow:hidden;
+  border:1px solid var(--line)}
+.bar > i{display:block;height:100%;border-radius:7px;
+  background:linear-gradient(90deg,var(--purple),var(--purple-e));transition:width .5s}
+.ov-stats{display:flex;flex-direction:column;justify-content:center;gap:12px}
+.stat{display:flex;align-items:baseline;gap:10px}
+.stat .v{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--yellow);
+  line-height:.9;min-width:74px}
+.stat .k{font-size:13px;color:var(--muted)}
+.now-line{margin-top:14px;font-size:13.5px;color:var(--muted)}
+.now-line b{color:var(--text)}
+
+/* ---- stairs ---- */
+.stairs{display:flex;gap:16px;align-items:flex-end;padding-top:30px}
+.step{flex:1;position:relative;cursor:pointer;border-radius:14px;
+  background:var(--panel);border:1px solid var(--line);padding:15px 14px 14px;
+  margin-bottom:calc(var(--i) * var(--rise));transition:transform .15s,border-color .15s}
+.step::after{content:"";position:absolute;top:100%;left:10px;right:10px;
+  height:calc(var(--i) * var(--rise));
+  background:linear-gradient(180deg,var(--panel),rgba(20,20,24,0));
+  border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.step:hover{transform:translateY(-3px)}
+.step .s-num{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1;
+  color:var(--muted2)}
+.step .s-name{font-weight:700;font-size:14.5px;margin:5px 0 3px}
+.step .s-date{font-size:12px;color:var(--muted)}
+.step .s-gate{font-size:11.5px;color:var(--muted2);margin-top:8px;min-height:30px}
+.step .s-bar{height:6px;border-radius:4px;background:var(--panel2);overflow:hidden;
+  margin-top:9px;border:1px solid var(--line)}
+.step .s-bar > i{display:block;height:100%}
+.step .s-foot{display:flex;justify-content:space-between;align-items:center;
+  margin-top:8px;font-size:11px}
+.step .s-stat{text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.step .s-cnt{color:var(--muted)}
+.step.done{border-color:rgba(63,207,142,.45)}
+.step.done .s-num{color:var(--green)}
+.step.active{border-color:var(--yellow);
+  box-shadow:0 0 0 1px var(--yellow),0 10px 34px rgba(255,247,5,.10)}
+.step.active .s-num{color:var(--yellow)}
+.step.overdue{border-color:rgba(255,77,79,.55)}
+.step.overdue .s-num{color:var(--red)}
+.step.upcoming{opacity:.66}
+
+/* ---- stage details ---- */
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  margin-bottom:12px;overflow:hidden}
+.stage[open]{border-color:var(--purple-d)}
+.stage > summary{list-style:none;cursor:pointer;padding:16px 18px;
+  display:flex;align-items:center;gap:14px}
+.stage > summary::-webkit-details-marker{display:none}
+.stage > summary::after{content:"▾";color:var(--muted);font-size:13px;
+  transition:transform .2s}
+.stage[open] > summary::after{transform:rotate(180deg)}
+.sm-num{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:.8;
+  color:var(--muted2);width:42px;flex:none}
+.sm-main{flex:1;min-width:0}
+.sm-name{font-weight:700;font-size:16px}
+.sm-date{font-size:12.5px;color:var(--muted)}
+.sm-side{display:flex;align-items:center;gap:14px;flex:none}
+.sm-prog{width:120px}
+.sm-prog .bar{height:8px}
+.sm-prog .pl{font-size:11px;color:var(--muted);margin-top:4px;text-align:right}
+.badge{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 9px;border-radius:7px;white-space:nowrap}
+.stage-body{padding:4px 18px 18px;border-top:1px solid var(--line)}
+.gate{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);
+  border:1px solid var(--line);border-left:3px solid var(--purple-e);
+  border-radius:9px;padding:11px 13px;margin:14px 0;font-size:13.5px}
+.gate .gk{color:var(--purple-l);font-weight:800;text-transform:uppercase;
+  font-size:11px;letter-spacing:.08em;flex:none;padding-top:1px}
+.tasks{display:flex;flex-direction:column;gap:2px}
+.task{display:flex;align-items:flex-start;gap:11px;padding:9px 8px;border-radius:9px}
+.task:hover{background:var(--panel2)}
+.task input{appearance:none;-webkit-appearance:none;width:20px;height:20px;flex:none;
+  border:1.6px solid var(--line);border-radius:6px;cursor:pointer;margin-top:1px;
+  background:var(--bg);position:relative}
+.task input:checked{background:var(--green);border-color:var(--green)}
+.task input:checked::after{content:"";position:absolute;left:6px;top:2px;width:5px;
+  height:10px;border:solid #06210F;border-width:0 2.4px 2.4px 0;transform:rotate(45deg)}
+.task .tx{flex:1;font-size:14px}
+.task input:checked + .tx{color:var(--muted);text-decoration:line-through}
+.task .due{font-size:11px;color:var(--muted2);white-space:nowrap}
+.rbadge{font-size:10px;font-weight:800;letter-spacing:.04em;padding:3px 7px;
+  border-radius:6px;white-space:nowrap;flex:none;margin-top:1px}
+.notes{margin-top:14px;background:rgba(255,247,5,.06);
+  border:1px solid rgba(255,247,5,.28);border-radius:10px;padding:12px 14px}
+.notes .nh{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--yellow);margin-bottom:7px}
+.notes ul{margin:0;padding-left:18px;font-size:13px;color:var(--muted)}
+.notes li{margin:3px 0}
+
+/* ---- generic grids ---- */
+.grid{display:grid;gap:12px}
+.team{grid-template-columns:repeat(3,1fr)}
+.role{background:var(--panel);border:1px solid var(--line);border-radius:13px;
+  padding:14px;border-top:3px solid var(--rc,var(--purple))}
+.role .rc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.role .rcode{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--rc)}
+.role .ropen{font-size:11px;color:var(--muted)}
+.role .ropen b{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);
+  vertical-align:-2px}
+.role .rname{font-weight:700;font-size:14px;margin-top:2px}
+
+/* ---- KPI funnel ---- */
+.funnel{display:flex;flex-direction:column;gap:9px}
+.frow{display:flex;align-items:center;gap:14px}
+.frow .fl{width:130px;flex:none;font-size:13px;color:var(--muted)}
+.fbar{flex:1;height:42px;border-radius:9px;display:flex;align-items:center;
+  padding-left:14px;background:linear-gradient(90deg,var(--purple),var(--purple-e));
+  font-weight:800;font-size:15px;color:#fff;border:1px solid var(--line)}
+.fbar.f0{background:linear-gradient(90deg,var(--yellow),#E6D400);color:#161200}
+
+/* ---- budget ---- */
+.bud-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.bud-head .bk{font-family:'Bebas Neue',sans-serif;font-size:46px;color:var(--yellow);
+  line-height:.9}
+.bud-head .bd{font-size:13px;color:var(--muted)}
+.brow{display:flex;align-items:center;gap:12px;padding:7px 0;
+  border-bottom:1px solid var(--line)}
+.brow:last-child{border-bottom:none}
+.brow .bn{width:210px;flex:none;font-size:13px}
+.brow .bt{flex:1;height:14px;border-radius:5px;background:var(--panel2);
+  border:1px solid var(--line);overflow:hidden;position:relative}
+.brow .bt > i{display:block;height:100%;border-radius:5px;
+  background:linear-gradient(90deg,var(--purple-d),var(--purple-l))}
+.brow.top .bt > i{background:linear-gradient(90deg,#E6D400,var(--yellow))}
+.brow .bv{width:150px;flex:none;text-align:right;font-size:12.5px;color:var(--muted)}
+.brow.top .bn{color:var(--yellow);font-weight:700}
+
+/* ---- run of show ---- */
+.ros{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ros details{background:var(--panel);border:1px solid var(--line);border-radius:13px}
+.ros summary{cursor:pointer;list-style:none;padding:14px 16px;font-weight:700;
+  display:flex;justify-content:space-between;align-items:center}
+.ros summary::-webkit-details-marker{display:none}
+.ros summary::after{content:"▾";color:var(--muted);font-size:12px}
+.ros details[open] summary::after{transform:rotate(180deg)}
+.ros summary .rd{font-size:12px;color:var(--muted);font-weight:500}
+.ros .rb{padding:2px 16px 14px;border-top:1px solid var(--line)}
+.rline{display:flex;gap:13px;padding:8px 0;border-bottom:1px solid var(--line)}
+.rline:last-child{border-bottom:none}
+.rline .rt{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--yellow);
+  width:62px;flex:none;line-height:1}
+.rline .ri{font-size:13px}
+
+/* ---- footer ---- */
+footer{margin-top:42px;border-top:1px solid var(--line);padding-top:20px;
+  color:var(--muted2);font-size:12.5px;display:flex;justify-content:space-between;
+  gap:16px;flex-wrap:wrap}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+  font-family:inherit;font-size:12px;padding:7px 13px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--purple-e);color:var(--text)}
+
+@media(max-width:860px){
+  .stairs{flex-direction:column;align-items:stretch}
+  .step{margin-bottom:0!important}
+  .step::after{display:none}
+  .overall{grid-template-columns:1fr}
+  .team{grid-template-columns:1fr}
+  .ros{grid-template-columns:1fr}
+  .sm-prog{display:none}
+  .brow .bn{width:130px}
+  .brow .bv{width:auto}
+  .hdr-cd .txt{display:none}
+}
+@media print{
+  .top{position:static}.btn{display:none}
+  body{background:#fff;color:#000}
+  .step,.stage,.card,.role{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="logo">
+      <span class="mark bebas">НЕЙРО<b>СЕТИ</b></span>
+      <span class="tag">ИИ, который работает</span>
+    </div>
+    <div class="hdr-cd">
+      <span class="txt">До Дня&nbsp;1</span>
+      <b id="hdrCd">—</b>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO + COUNTDOWN -->
+  <div class="hero">
+    <div class="hero-in">
+      <div class="eyebrow">Дашборд подготовки мероприятия</div>
+      <h1>НЕЙРОСЕТИ. 10 ЛЕТ</h1>
+      <div class="meta" id="heroMeta">—</div>
+      <div class="cd">
+        <div class="cd-cell"><div class="num" id="cdD">--</div><div class="lbl">дней</div></div>
+        <div class="cd-cell"><div class="num" id="cdH">--</div><div class="lbl">часов</div></div>
+        <div class="cd-cell"><div class="num" id="cdM">--</div><div class="lbl">минут</div></div>
+        <div class="cd-cell"><div class="num" id="cdS">--</div><div class="lbl">секунд</div></div>
+      </div>
+      <div class="cd-foot">
+        <span class="chip" id="cdLabel">—</span>
+        <span class="chip" id="cdDay2">—</span>
+        <span class="chip" id="cdSprint">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERALL -->
+  <section>
+    <div class="sec-h"><h2>Общий прогресс</h2><span class="line"></span></div>
+    <div class="overall">
+      <div class="card">
+        <div class="ov-big">
+          <div class="ov-pct"><span id="ovPct">0</span><small>%</small></div>
+          <div style="flex:1">
+            <div class="bar"><i id="ovBar" style="width:0%"></i></div>
+            <div class="now-line" id="ovNow">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="card ov-stats">
+        <div class="stat"><span class="v" id="stStages">0/6</span><span class="k">этапов закрыто</span></div>
+        <div class="stat"><span class="v" id="stTasks">0/0</span><span class="k">задач выполнено</span></div>
+        <div class="stat"><span class="v" id="stDays">—</span><span class="k">дней до Дня&nbsp;1</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAIRS -->
+  <section>
+    <div class="sec-h"><h2>Этапы — ступени подготовки</h2><span class="line"></span></div>
+    <div class="stairs" id="stairs"></div>
+  </section>
+
+  <!-- STAGE DETAILS -->
+  <section>
+    <div class="sec-h"><h2>Этапы и задачи</h2><span class="line"></span></div>
+    <div id="stages"></div>
+  </section>
+
+  <!-- TEAM -->
+  <section>
+    <div class="sec-h"><h2>Команда и роли</h2><span class="line"></span></div>
+    <div class="grid team" id="team"></div>
+  </section>
+
+  <!-- KPI -->
+  <section>
+    <div class="sec-h"><h2>Воронка KPI · на день</h2><span class="line"></span></div>
+    <div class="card"><div class="funnel" id="funnel"></div></div>
+  </section>
+
+  <!-- BUDGET -->
+  <section>
+    <div class="sec-h"><h2>Бюджет, BYN</h2><span class="line"></span></div>
+    <div class="card">
+      <div class="bud-head">
+        <span class="bk" id="budFrame">—</span>
+        <span class="bd">ориентир сметы на двухдневное мероприятие · гонорар приглашённого спикера — отдельно, на согласовании</span>
+      </div>
+      <div id="budRows"></div>
+    </div>
+  </section>
+
+  <!-- RUN OF SHOW -->
+  <section>
+    <div class="sec-h"><h2>Программа дней · Run of show</h2><span class="line"></span></div>
+    <div class="ros" id="ros"></div>
+  </section>
+
+  <footer>
+    <div>
+      Данные кампании правятся в блоке <b>&lt;script&gt;</b> в начале этого файла
+      (объект <b>DATA</b>) — измените и закоммитьте, чтобы команда видела общую картину.
+      Отметки задач сохраняются в этом браузере (localStorage).
+    </div>
+    <div style="text-align:right">
+      <div>Данные актуальны на: <b id="updatedAt">—</b></div>
+      <button class="btn" id="resetBtn" style="margin-top:8px">Сбросить мои отметки</button>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* ============================================================
+   ДАННЫЕ КАМПАНИИ — редактируйте этот блок.
+   КАК ПРАВИТЬ:
+   • меняйте только текст в кавычках и числа;
+   • НЕ меняйте поля "id" у этапов и задач — к ним привязаны
+     сохранённые отметки. Новые задачи добавляйте новой строкой
+     с уникальным id (например 's2-t8');
+   • "done:true" — статус по умолчанию (канонический для команды);
+   • статус этапа не задаётся вручную — он вычисляется из задач и дат.
+   ============================================================ */
+const DATA = {
+  EVENT:{
+    title:"НЕЙРОСЕТИ. 10 ЛЕТ",
+    tagline:"ИИ, который работает",
+    organizer:"АО «Нейросети» · neiroseti.ai",
+    city:"Минск",
+    guestsPerDay:"100–150 гостей в день",
+    day1:"2026-06-11T18:00:00+03:00",
+    day1end:"2026-06-11T21:30:00+03:00",
+    day2:"2026-06-12T18:30:00+03:00",
+    day2end:"2026-06-12T23:00:00+03:00",
+    sprintStart:"2026-05-17",
+    sprintDays:25,
+    updated:"2026-05-18"
+  },
+
+  ROLES:{
+    PM:{name:"Проект-менеджмент",color:"#AC59FF"},
+    OUT:{name:"База и outreach",color:"#FFF705"},
+    MKT:{name:"Маркетинг / digital",color:"#4DA3FF"},
+    VEN:{name:"Венью и логистика",color:"#FF9F45"},
+    CNT:{name:"Контент и сцена",color:"#FF6FB5"},
+    PRT:{name:"Партнёрства",color:"#3FCF8E"}
+  },
+
+  STAGES:[
+    {
+      id:"s0", name:"Спринт 0 — Ключевые решения",
+      start:"2026-05-17", end:"2026-05-18",
+      gate:"Бюджет утверждён, площадки запрошены, агент-сборщик запущен",
+      tasks:[
+        {id:"s0-t1", text:"Утвердить бюджетную рамку и смету", role:"PM"},
+        {id:"s0-t2", text:"Шорт-лист площадок 4–5 и разослать запросы", role:"VEN"},
+        {id:"s0-t3", text:"Решение по приглашённому спикеру — подтвердить или закрыть вопрос", role:"CNT"},
+        {id:"s0-t4", text:"ТЗ агента-сборщика контактов и его запуск", role:"OUT", done:true},
+        {id:"s0-t5", text:"Определить состав подарка «ИИ бизнес-аналитик»", role:"CNT"},
+        {id:"s0-t6", text:"Список партнёров с базами, заготовка оффера", role:"PRT"}
+      ],
+      notes:[
+        "Площадка ещё не выбрана — нужен шорт-лист и запросы КП",
+        "Точный состав подарка «ИИ бизнес-аналитик» не зафиксирован",
+        "Приглашённый спикер на согласовании (Игорь Манн / Оскар Хартманн в переговорах) — в промо не выносить до договора",
+        "Проверить право на упоминание клиентских кейсов и цифр со сцены"
+      ]
+    },
+    {
+      id:"s1", name:"Спринт 1 — Фундамент",
+      start:"2026-05-19", end:"2026-05-25",
+      gate:"Площадка забронирована, регистрация открыта, база собрана на ~215 компаний",
+      tasks:[
+        {id:"s1-t1", text:"Выбрать и забронировать площадку, подписать договор, внести предоплату", role:"VEN"},
+        {id:"s1-t2", text:"Лендинг + форма регистрации с онлайн-согласием на коммуникацию", role:"MKT"},
+        {id:"s1-t3", text:"Первый прогон агента — база ~215 компаний с контактами", role:"OUT"},
+        {id:"s1-t4", text:"Save-the-date рассылка по готовой части базы", role:"OUT"},
+        {id:"s1-t5", text:"Партнёрские договорённости, передача анонса партнёрам", role:"PRT"},
+        {id:"s1-t6", text:"Креативы: афиша, посты, баннеры", role:"MKT"},
+        {id:"s1-t7", text:"Запросы КП на кейтеринг, AV-технику, фото/видео", role:"VEN"}
+      ]
+    },
+    {
+      id:"s2", name:"Спринт 2 — Активный набор",
+      start:"2026-05-26", end:"2026-06-01",
+      gate:"Регистраций ≥ 60% от цели, программа и подрядчики закрыты",
+      tasks:[
+        {id:"s2-t1", text:"Персональные приглашения и обзвон по тёплым и приоритетным контактам", role:"OUT"},
+        {id:"s2-t2", text:"Запуск рекламы: таргет и ретаргет Facebook/Instagram, операторы", role:"MKT"},
+        {id:"s2-t3", text:"Партнёрские рассылки по базам партнёров — волна 1", role:"PRT"},
+        {id:"s2-t4", text:"Финализировать программу двух дней", role:"CNT"},
+        {id:"s2-t5", text:"Договоры со спикером и ведущим / стендап-артистом", role:"CNT"},
+        {id:"s2-t6", text:"Законтрактовать подрядчиков, утвердить меню кейтеринга", role:"VEN"},
+        {id:"s2-t7", text:"Контроль воронки регистраций против плана", role:"PM"}
+      ]
+    },
+    {
+      id:"s3", name:"Спринт 3 — Дожим",
+      start:"2026-06-02", end:"2026-06-08",
+      gate:"Регистраций ≥ 100% от цели с учётом no-show, полиграфия готова",
+      tasks:[
+        {id:"s3-t1", text:"Дожим регистраций: обзвон тёплых, волна 2 партнёрских рассылок", role:"OUT"},
+        {id:"s3-t2", text:"Подтверждение гостей звонком/сообщением, уточнение дня", role:"OUT"},
+        {id:"s3-t3", text:"Печать полиграфии: бейджи, программки, навигация", role:"VEN"},
+        {id:"s3-t4", text:"Подарки готовы и протестированы", role:"CNT"},
+        {id:"s3-t5", text:"Финальный run-of-show, брифинг команды и подрядчиков", role:"PM"},
+        {id:"s3-t6", text:"Репетиция сцены и техники", role:"CNT"}
+      ]
+    },
+    {
+      id:"s4", name:"Финал — Монтаж и мероприятие",
+      start:"2026-06-09", end:"2026-06-12",
+      gate:"Мероприятие проведено: День 1 и День 2",
+      tasks:[
+        {id:"s4-t1", text:"9–10 июня: финальные подтверждения, листы регистрации по дням", role:"OUT"},
+        {id:"s4-t2", text:"10–11 июня: монтаж площадки, брендинг, AV-проверка", role:"VEN"},
+        {id:"s4-t3", text:"11 июня — День 1: деловая программа и мастер-класс", role:"CNT"},
+        {id:"s4-t4", text:"12 июня — День 2: праздник и бизнес-стендап", role:"CNT"},
+        {id:"s4-t5", text:"Лид-капчер оба дня: сбор листов регистрации в CRM", role:"OUT"}
+      ]
+    },
+    {
+      id:"s5", name:"Постмероприятие",
+      start:"2026-06-13", end:"2026-06-20",
+      gate:"Лиды обработаны, итоги подведены против KPI",
+      tasks:[
+        {id:"s5-t1", text:"Лиды из листов регистрации → CRM, сегментация по интересам", role:"OUT"},
+        {id:"s5-t2", text:"Follow-up: благодарность, материалы, оффер", role:"MKT"},
+        {id:"s5-t3", text:"Апсейл: обучение, внедрение, бизнес-завтраки", role:"OUT"},
+        {id:"s5-t4", text:"Пост-релиз и контент с события", role:"MKT"},
+        {id:"s5-t5", text:"Разбор результатов против KPI", role:"PM"}
+      ]
+    }
+  ],
+
+  KPI_FUNNEL:[
+    {stage:"Приглашения",   val:"1500–2500"},
+    {stage:"Регистрации",   val:"220–300"},
+    {stage:"Подтвердившие", val:"160–200"},
+    {stage:"Явка",          val:"100–150"}
+  ],
+
+  BUDGET:{
+    frameMin:27000, frameMax:77000,
+    items:[
+      {name:"Аренда площадки",        min:3000, max:9000},
+      {name:"AV / техника",           min:1000, max:4000},
+      {name:"Кейтеринг, День 1",      min:3500, max:6000},
+      {name:"Кейтеринг, День 2",      min:8000, max:15000, top:true},
+      {name:"Декор и брендинг",       min:1500, max:5000},
+      {name:"Полиграфия",             min:1500, max:3500},
+      {name:"Подарки участникам",     min:0,    max:6500},
+      {name:"Ведущий + бизнес-стендап",min:1500,max:4500},
+      {name:"Фото / видео",           min:1200, max:3500},
+      {name:"Реклама и таргет",        min:2000, max:8000},
+      {name:"Лендинг и рег.система",   min:0,    max:1000},
+      {name:"Логистика и прочее",      min:1000, max:3000},
+      {name:"Резерв (~12%)",           min:2900, max:8300}
+    ]
+  },
+
+  RUN_OF_SHOW:{
+    day1:{title:"День 1 — Деловой", date:"Четверг, 11 июня · 18:00–21:30", rows:[
+      {t:"18:00", i:"Регистрация, welcome-напитки, нетворкинг"},
+      {t:"18:30", i:"Открытие. 10 лет «Нейросети». «Путь самурая»"},
+      {t:"18:50", i:"«А не пузырь ли AI — давайте разберёмся»"},
+      {t:"19:20", i:"Разбор реальных кейсов внедрения ИИ"},
+      {t:"19:50", i:"Перерыв, кофе, нетворкинг"},
+      {t:"20:05", i:"Мастер-класс «Разберём скелетов из шкафов ИИ»"},
+      {t:"20:50", i:"Подарок участникам: ИИ бизнес-аналитик"},
+      {t:"21:05", i:"Оффер: обучение, внедрение, бизнес-завтраки"},
+      {t:"21:30", i:"Завершение, неформальное общение"}
+    ]},
+    day2:{title:"День 2 — Праздник", date:"Пятница, 12 июня · 18:30–23:00", rows:[
+      {t:"18:30", i:"Сбор гостей, welcome, фотозона"},
+      {t:"19:00", i:"Открытие. День рождения АО «Нейросети» — 10 лет"},
+      {t:"19:20", i:"Бизнес-стендап"},
+      {t:"20:00", i:"Праздничная часть, тосты, нетворкинг"},
+      {t:"21:00", i:"Активности, общение, музыка"},
+      {t:"23:00", i:"Завершение"}
+    ]}
+  }
+};
+
+/* ================== ЛОГИКА (менять не нужно) ================== */
+const LS_KEY="neiroseti-event-dashboard-v1";
+const MONTHS=["января","февраля","марта","апреля","мая","июня","июля",
+  "августа","сентября","октября","ноября","декабря"];
+const $=id=>document.getElementById(id);
+
+let overrides={};
+try{overrides=JSON.parse(localStorage.getItem(LS_KEY))||{};}catch(e){overrides={};}
+
+function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(overrides));}catch(e){}}
+function defDone(t){return t.done===true;}
+function isDone(t){return overrides.hasOwnProperty(t.id)?!!overrides[t.id]:defDone(t);}
+
+function ymdInt(s){const[y,m,d]=s.split("-").map(Number);return y*10000+m*100+d;}
+function todayInt(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
+function fmtD(s){const[,m,d]=s.split("-").map(Number);return d+" "+MONTHS[m-1];}
+function fmtRange(a,b){
+  const am=a.split("-")[1], bm=b.split("-")[1];
+  return am===bm ? a.split("-")[2]*1+"–"+b.split("-")[2]*1+" "+MONTHS[am*1-1]
+                 : fmtD(a)+" – "+fmtD(b);
+}
+function pad(n){return String(n).padStart(2,"0");}
+
+function stageStatus(st){
+  const total=st.tasks.length, done=st.tasks.filter(isDone).length;
+  if(total>0 && done===total) return "done";
+  const t=todayInt(), s=ymdInt(st.start), e=ymdInt(st.end);
+  if(t>e) return "overdue";
+  if(t>=s && t<=e) return "active";
+  return "upcoming";
+}
+function stageProgress(st){
+  const total=st.tasks.length||1;
+  return Math.round(st.tasks.filter(isDone).length/total*100);
+}
+const STATUS={
+  done:{txt:"Готово",color:"var(--green)"},
+  active:{txt:"В работе",color:"var(--yellow)"},
+  overdue:{txt:"Просрочено",color:"var(--red)"},
+  upcoming:{txt:"Впереди",color:"var(--grey)"}
+};
+function rBadge(code){
+  const r=DATA.ROLES[code];
+  return `<span class="rbadge" style="background:${r.color}22;color:${r.color};
+    border:1px solid ${r.color}66" title="${r.name}">${code}</span>`;
+}
+
+/* ---- validate unique ids ---- */
+(function(){
+  const seen={};
+  DATA.STAGES.forEach(s=>s.tasks.forEach(t=>{
+    if(seen[t.id]) console.warn("Дашборд: дублирующийся id задачи — "+t.id);
+    seen[t.id]=1;
+  }));
+})();
+
+/* ---- stairs ---- */
+function renderStairs(){
+  $("stairs").innerHTML=DATA.STAGES.map((st,i)=>{
+    const sStatus=stageStatus(st), pr=stageProgress(st);
+    const c=STATUS[sStatus].color;
+    const done=st.tasks.filter(isDone).length;
+    return `<div class="step ${sStatus}" style="--i:${i}" data-stage="${st.id}">
+      <div class="s-num">${i}</div>
+      <div class="s-name">${st.name.replace(/^[^—]*—\s*/,"")}</div>
+      <div class="s-date">${fmtRange(st.start,st.end)}</div>
+      <div class="s-gate">${st.gate}</div>
+      <div class="s-bar"><i style="width:${pr}%;background:${c}"></i></div>
+      <div class="s-foot">
+        <span class="s-stat" style="color:${c}">${STATUS[sStatus].txt}</span>
+        <span class="s-cnt">${done}/${st.tasks.length}</span>
+      </div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".step").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const d=$("stage-"+el.dataset.stage);
+      d.open=true;
+      d.scrollIntoView({behavior:"smooth",block:"center"});
+    });
+  });
+}
+
+/* ---- stage details (built once) ---- */
+function renderStages(){
+  $("stages").innerHTML=DATA.STAGES.map((st,i)=>{
+    const tasks=st.tasks.map(t=>`
+      <label class="task">
+        <input type="checkbox" data-task="${t.id}" ${isDone(t)?"checked":""}>
+        <span class="tx">${t.text}</span>
+        ${t.due?`<span class="due">до ${fmtD(t.due)}</span>`:""}
+        ${rBadge(t.role)}
+      </label>`).join("");
+    const notes=st.notes?`<div class="notes">
+      <div class="nh">Критичные открытые решения</div>
+      <ul>${st.notes.map(n=>`<li>${n}</li>`).join("")}</ul></div>`:"";
+    return `<details class="stage" id="stage-${st.id}">
+      <summary>
+        <span class="sm-num">${i}</span>
+        <span class="sm-main">
+          <span class="sm-name">${st.name}</span><br>
+          <span class="sm-date">${fmtRange(st.start,st.end)}</span>
+        </span>
+        <span class="sm-side">
+          <span class="sm-prog">
+            <span class="bar"><i id="prog-${st.id}" style="width:0%"></i></span>
+            <span class="pl" id="pl-${st.id}">0/0</span>
+          </span>
+          <span class="badge" id="badge-${st.id}">—</span>
+        </span>
+      </summary>
+      <div class="stage-body">
+        <div class="gate"><span class="gk">Гейт</span><span>${st.gate}</span></div>
+        <div class="tasks">${tasks}</div>
+        ${notes}
+      </div>
+    </details>`;
+  }).join("");
+  document.querySelectorAll('input[data-task]').forEach(cb=>{
+    cb.addEventListener("change",()=>{
+      overrides[cb.dataset.task]=cb.checked;
+      saveState();
+      updateComputed();
+    });
+  });
+}
+
+/* ---- team ---- */
+function renderTeam(){
+  $("team").innerHTML=Object.entries(DATA.ROLES).map(([code,r])=>`
+    <div class="role" style="--rc:${r.color}">
+      <div class="rc-top">
+        <span class="rcode bebas">${code}</span>
+        <span class="ropen">открыто задач: <b id="team-${code}">0</b></span>
+      </div>
+      <div class="rname">${r.name}</div>
+    </div>`).join("");
+}
+
+/* ---- kpi ---- */
+function renderKPI(){
+  const n=DATA.KPI_FUNNEL.length;
+  $("funnel").innerHTML=DATA.KPI_FUNNEL.map((f,i)=>`
+    <div class="frow">
+      <span class="fl">${f.stage}</span>
+      <span class="fbar f${i}" style="max-width:${100-i*(55/n)}%">${f.val}</span>
+    </div>`).join("");
+}
+
+/* ---- budget ---- */
+function renderBudget(){
+  const B=DATA.BUDGET;
+  $("budFrame").textContent="≈ "+B.frameMin.toLocaleString("ru-RU")+" – "+
+    B.frameMax.toLocaleString("ru-RU");
+  const gmax=Math.max(...B.items.map(x=>x.max));
+  $("budRows").innerHTML=B.items.map(it=>`
+    <div class="brow ${it.top?"top":""}">
+      <span class="bn">${it.name}</span>
+      <span class="bt"><i style="width:${Math.round(it.max/gmax*100)}%"></i></span>
+      <span class="bv">${it.min.toLocaleString("ru-RU")} – ${it.max.toLocaleString("ru-RU")}</span>
+    </div>`).join("");
+}
+
+/* ---- run of show ---- */
+function renderROS(){
+  const block=(d,open)=>`<details ${open?"open":""}>
+    <summary><span>${d.title}</span><span class="rd">${d.date}</span></summary>
+    <div class="rb">${d.rows.map(r=>`
+      <div class="rline"><span class="rt">${r.t}</span><span class="ri">${r.i}</span></div>
+    `).join("")}</div></details>`;
+  $("ros").innerHTML=block(DATA.RUN_OF_SHOW.day1,true)+block(DATA.RUN_OF_SHOW.day2,false);
+}
+
+/* ---- recompute dynamic numbers ---- */
+function updateComputed(){
+  let total=0,done=0,stagesDone=0;
+  DATA.STAGES.forEach(st=>{
+    const t=st.tasks.length, d=st.tasks.filter(isDone).length;
+    total+=t; done+=d;
+    const ss=stageStatus(st), pr=stageProgress(st);
+    if(ss==="done") stagesDone++;
+    const bar=$("prog-"+st.id);
+    if(bar){
+      bar.style.width=pr+"%";
+      bar.style.background=STATUS[ss].color;
+      $("pl-"+st.id).textContent=d+"/"+t;
+      const b=$("badge-"+st.id);
+      b.textContent=STATUS[ss].txt;
+      b.style.background=STATUS[ss].color+"22";
+      b.style.color=STATUS[ss].color;
+      b.style.border="1px solid "+STATUS[ss].color+"66";
+    }
+  });
+  const pct=total?Math.round(done/total*100):0;
+  $("ovPct").textContent=pct;
+  $("ovBar").style.width=pct+"%";
+  $("stStages").textContent=stagesDone+"/"+DATA.STAGES.length;
+  $("stTasks").textContent=done+"/"+total;
+
+  /* open tasks per role */
+  const open={};
+  Object.keys(DATA.ROLES).forEach(r=>open[r]=0);
+  DATA.STAGES.forEach(st=>st.tasks.forEach(t=>{if(!isDone(t))open[t.role]++;}));
+  Object.keys(open).forEach(r=>{const el=$("team-"+r);if(el)el.textContent=open[r];});
+
+  /* active stage line */
+  const act=DATA.STAGES.find(s=>stageStatus(s)==="active")
+         || DATA.STAGES.find(s=>stageStatus(s)==="overdue");
+  $("ovNow").innerHTML=act
+    ? `Сейчас: <b>${act.name}</b> · гейт ${fmtD(act.end)} · `+
+      `${stageStatus(act)==="overdue"?'<b style="color:var(--red)">просрочен</b>':"в работе"}`
+    : "Все этапы по плану";
+
+  renderStairs();
+}
+
+/* ---- countdown ---- */
+function diffParts(ms){
+  if(ms<0)ms=0;
+  const s=Math.floor(ms/1000);
+  return {d:Math.floor(s/86400),h:Math.floor(s/3600)%24,
+          m:Math.floor(s/60)%60,s:s%60};
+}
+function tick(){
+  const E=DATA.EVENT, now=Date.now();
+  const d1=new Date(E.day1).getTime(), d1e=new Date(E.day1end).getTime();
+  const d2=new Date(E.day2).getTime(), d2e=new Date(E.day2end).getTime();
+
+  let target,label;
+  if(now<d1){target=d1;label="До Дня 1 · 11 июня";}
+  else if(now<d2){target=d2;label=(now<d1e?"День 1 идёт · ":"")+"До Дня 2 · 12 июня";}
+  else target=null;
+
+  if(target){
+    const p=diffParts(target-now);
+    $("cdD").textContent=p.d;
+    $("cdH").textContent=pad(p.h);
+    $("cdM").textContent=pad(p.m);
+    $("cdS").textContent=pad(p.s);
+    $("hdrCd").textContent=(now<d1?p.d+" дн":"Финал");
+  }else{
+    ["cdD","cdH","cdM","cdS"].forEach(id=>$(id).textContent="00");
+    $("cdD").textContent="0";
+    label="Мероприятие завершено";
+    $("hdrCd").textContent="✓";
+  }
+  $("cdLabel").innerHTML=`<span class="dot" style="background:var(--yellow)"></span>${label}`;
+
+  /* day 2 chip */
+  const d2p=diffParts(d2-now);
+  $("cdDay2").innerHTML=`<span class="dot" style="background:var(--purple-l)"></span>`+
+    (now<d2?`До Дня 2: <b>${d2p.d} дн ${pad(d2p.h)} ч</b>`:"День 2 завершён");
+
+  /* sprint day N of M */
+  const st=ymdInt(E.sprintStart), tdy=todayInt();
+  const dayN=Math.max(1,Math.min(E.sprintDays,
+    Math.floor((Date.UTC(tdy/10000|0,((tdy/100|0)%100)-1,tdy%100)-
+      Date.UTC(st/10000|0,((st/100|0)%100)-1,st%100))/86400000)+1));
+  $("cdSprint").innerHTML=`<span class="dot" style="background:var(--purple-e)"></span>`+
+    (now<d1?`Спринт: день <b>${dayN}</b> из ${E.sprintDays}`:`Спринт ${E.sprintDays} дней завершён`);
+
+  /* days-to-day1 stat */
+  if(now<d1){
+    const p=diffParts(d1-now);
+    $("stDays").textContent=p.d;
+  }else $("stDays").textContent="0";
+}
+
+/* ---- init ---- */
+function init(){
+  const E=DATA.EVENT;
+  $("heroMeta").innerHTML=
+    `<b>11–12 июня 2026</b> · ${E.city} · ${E.guestsPerDay} · ${E.organizer}`;
+  $("updatedAt").textContent=fmtD(E.updated)+" 2026";
+  renderStages();
+  renderTeam();
+  renderKPI();
+  renderBudget();
+  renderROS();
+  updateComputed();
+  tick();
+  setInterval(tick,1000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
+  $("resetBtn").addEventListener("click",()=>{
+    if(confirm("Сбросить ваши локальные отметки задач? Канонические статусы из файла останутся.")){
+      overrides={};saveState();
+      document.querySelectorAll('input[data-task]').forEach(cb=>{
+        const t=DATA.STAGES.flatMap(s=>s.tasks).find(x=>x.id===cb.dataset.task);
+        cb.checked=defDone(t);
+      });
+      updateComputed();
+    }
+  });
+}
+init();
+</script>
+</body>
+</html>
